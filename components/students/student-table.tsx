@@ -70,7 +70,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     const accessToken = session?.user?.id;
     // console.log('🚀 ~ student-table.tsx:71 ~ accessToken:', accessToken);
     const [data, setData] = useState<Students[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
     const [pagination, setPagination] = useState<PaginationState>({
@@ -124,7 +124,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             },
             cell: ({ row }) => (
                 <div className="whitespace-nowrap ">
-                    {row.getValue("employee_id")}
+                    {row.getValue("id")}
                 </div>
             ),
         },
@@ -165,10 +165,10 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         },
 
         {
-            accessorKey: "status",
+            accessorKey: "is_active",
             header: t("status"),
             cell: ({ row }) => {
-                const isActive = row.getValue("status") === 1;
+                const isActive = row.getValue("is_active") === 1;
                 return (
                     <Badge
                         variant={isActive ? "default" : "destructive"}
@@ -316,12 +316,18 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
 
         if (response.ok) {
             const responseData = await response.json();
-            const studentData = responseData?.data?.data as Students[];
+            // console.log('🚀 ~ student-table.tsx:319 ~ responseData:', responseData);
+            const studentData = responseData?.data?.tableData as Students[];
             const pageCount = Math.ceil(responseData?.data?.metadata?.totalRows / pagination.pageSize);
             if (pageCount === 0) {
                 setTotalPage(() => 1);
             } else {
                 setTotalPage(() => pageCount);
+            }
+            if (studentData.length === 0) {
+                setData(() => []);
+                setIsLoading(false)
+                return;
             }
             setData(() => studentData);
             setIsLoading(false)
