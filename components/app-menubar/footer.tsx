@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-export default function SiteFooter() {
+export default function Footer() {
   const author = {
     name: "Majedul",
     href: "https://github.com/majedul-uxbd",

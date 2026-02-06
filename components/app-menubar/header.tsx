@@ -5,20 +5,21 @@ import { HousePlus } from "lucide-react";
 import React from "react";
 import { ModeToggle } from "../shared/mode-toggle";
 import { NavUser } from "./nav-user";
+import Image from "next/image";
 
 const Header = ({ session }: { session: any }) => {
 	return (
 		<header
-			className="h-14 border-b px-4 md:px-5 z-50 
-             bg-linear-to-r from-sky-300 to-sky-800 
-             dark:from-sky-900 dark:to-sky-600"
+			className="h-14 border-b px-4 md:px-5 z-50 bg-accent top-0"
 		>
 			<div className="flex h-full items-center justify-between">
 				{/* Desktop Navigation */}
 				<nav className="hidden md:flex items-center gap-x-4">
 					<div className="flex flex-row items-center gap-x-4">
-						<HousePlus className="h-8 w-8" />
-						<span className="text-lg font-semibold">ERP System</span>
+						{/* <HousePlus className="h-5 w-5" /> */}
+						<img src="/coachbee/logo.png" alt="Logo" className="w-36 cursor-pointer mr-14 dark" />
+						{/* <Image src="/coachbee/logo.png" alt="Logo" width={32} height={32} /> */}
+						{/* <span className="text-lg font-semibold">ERP System</span> */}
 					</div>
 				</nav>
 
@@ -31,7 +32,7 @@ const Header = ({ session }: { session: any }) => {
 				</div>
 				<div className="flex">
 					<ModeToggle />
-					<NavUser session={session?.user} />
+					{/* <NavUser session={session?.user} /> */}
 				</div>
 			</div>
 		</header>

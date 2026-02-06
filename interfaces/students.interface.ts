@@ -1,0 +1,11 @@
+export interface Students {
+    id: number;
+    full_name: string;
+    class: string;
+    guardian_phone: number;
+    address: string;
+    monthly_fee: number;
+    is_active: number;
+    created_at: Date;
+    updated_at: Date | null;
+}
