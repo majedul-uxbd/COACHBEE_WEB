@@ -66,10 +66,11 @@ const highlightText = (text: string, search: string) => {
     );
 };
 
-const StudentsTable = (session: StudentsTableProps) => {
-    const accessToken = session?.session.id;
+const StudentsTable = ({ session }: StudentsTableProps) => {
+    const accessToken = session?.user?.id;
+    // console.log('🚀 ~ student-table.tsx:71 ~ accessToken:', accessToken);
     const [data, setData] = useState<Students[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
     const [pagination, setPagination] = useState<PaginationState>({
@@ -315,14 +316,14 @@ const StudentsTable = (session: StudentsTableProps) => {
 
         if (response.ok) {
             const responseData = await response.json();
-            const employeeData = responseData?.data?.data as Students[];
+            const studentData = responseData?.data?.data as Students[];
             const pageCount = Math.ceil(responseData?.data?.metadata?.totalRows / pagination.pageSize);
             if (pageCount === 0) {
                 setTotalPage(() => 1);
             } else {
                 setTotalPage(() => pageCount);
             }
-            setData(() => employeeData)
+            setData(() => studentData);
             setIsLoading(false)
         }
         else {
@@ -412,14 +413,14 @@ const StudentsTable = (session: StudentsTableProps) => {
                     </Popover>
                     <CreateStudent
                         session={session}
-                    // onCreateSuccess={() => {
-                    //     studentsTableData({
-                    //         itemsPerPage: pagination.pageSize,
-                    //         currentPageNumber: pagination.pageIndex,
-                    //         sortOrder: "asc",
-                    //         filterBy: "",
-                    //     });
-                    // }}
+                        onCreateSuccess={() => {
+                            studentsTableData({
+                                itemsPerPage: pagination.pageSize,
+                                currentPageNumber: pagination.pageIndex,
+                                sortOrder: "desc",
+                                filterBy: "",
+                            });
+                        }}
                     />
                 </div>
             </div>

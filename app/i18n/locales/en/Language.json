@@ -24,5 +24,6 @@
     "address_is_required": "Address is required",
     "maximum_length_address": "Maximum length is 200 characters",
     "monthly_fee_is_required": "Monthly fee is required",
-    "create_student": "Create Student"
+    "create_student": "Create Student",
+    "create_student_dialog_description": "Fill in the details below to create a new student."
 }

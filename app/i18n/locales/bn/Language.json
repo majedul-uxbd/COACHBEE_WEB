@@ -24,5 +24,6 @@
     "address_is_required": "ঠিকানা প্রয়োজন",
     "maximum_length_address": "সর্বোচ্চ দৈর্ঘ্য 200 অক্ষর",
     "monthly_fee_is_required": "মাসিক ফি প্রয়োজন",
-    "create_student": "ছাত্র তৈরি করুন"
+    "create_student": "ছাত্র তৈরি করুন",
+    "create_student_dialog_description": "নতুন ছাত্র তৈরি করতে নিচের বিবরণগুলি পূরণ করুন।"
 }

@@ -42,10 +42,10 @@ const ClassList = {
 
 interface CreateStudentProps {
     session: any;
-    // onCreateSuccess(): void;
+    onCreateSuccess(): void;
 }
 const CreateStudent = ({
-    session }: CreateStudentProps) => {
+    session, onCreateSuccess }: CreateStudentProps) => {
     const authToken = session?.id;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
