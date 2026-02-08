@@ -13,7 +13,6 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreateSchema } from "@/schema/employee.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SquarePlus } from "lucide-react";
 import { useState } from "react";
@@ -49,7 +48,6 @@ const CreateStudent = ({
     const authToken = session?.id;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
     const pathname = usePathname();
     const lng = pathname.split('/')[1];
     const { t } = useTranslation(lng, 'Language');

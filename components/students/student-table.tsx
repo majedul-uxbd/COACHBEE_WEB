@@ -37,15 +37,26 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Checkbox } from "../ui/checkbox";
 import CreateStudent from "./create-student";
-// import ActivateEmployee from "@/components/hrm-module/employees/active-employee";
-// import DeactivateEmployee from "@/components/hrm-module/employees/deactive-employee";
-// import { Depot } from "@/interfaces/depot.interface";
-// import CreateEmployee from "@/components/hrm-module/employees/create-employee";
 
 
 interface StudentsTableProps {
     session: any;
 }
+
+// const ClassList = {
+//     "One": "one",
+//     "Two": "two",
+//     "Three": "three",
+//     "Four": "four",
+//     "Five": "five",
+//     "Six": "six",
+//     "Seven": "seven",
+//     "Eight": "eight",
+//     "Nine": "nine",
+//     "Ten": "ten",
+//     "Eleven": "eleven",
+//     "Twelve": "twelve"
+// }
 
 const highlightText = (text: string, search: string) => {
     if (!search) return text;
@@ -80,8 +91,6 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     const [globalFilter, setGlobalFilter] = useState("");
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [rowSelection, setRowSelection] = useState({})
-    const [idCount, setIdCount] = useState<any[]>([]);
-    const [postingData, setPostingData] = useState<any[]>([]);
     const pathname = usePathname();
     const lng = pathname.split("/")[1];
     const { t } = useTranslation(lng, "Language");
@@ -143,7 +152,8 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             header: t("class"),
             cell: ({ row }) => {
                 const className = row.getValue("class") as string;
-                return <div className="whitespace-nowrap text-start">{highlightText(className, globalFilter)}</div>;
+                const formattedClass = className.charAt(0).toUpperCase() + className.slice(1);
+                return <div className="whitespace-nowrap">{highlightText(formattedClass, globalFilter)}</div>;
             },
         },
 
@@ -152,7 +162,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             header: t("guardian_phone"),
             cell: ({ row }) => {
                 const guardianPhone = row.getValue("guardian_phone") as string;
-                return <div className="whitespace-nowrap text-start">{highlightText(guardianPhone, globalFilter)}</div>;
+                return <div className="whitespace-nowrap">{highlightText(guardianPhone, globalFilter)}</div>;
             },
         },
 
