@@ -127,9 +127,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             },
             enableSorting: true,
             sortingFn: (rowA, rowB, columnId) => {
-                const numA = parseInt((rowA.getValue(columnId) as string).replace(/\D/g, ""), 10);
-                const numB = parseInt((rowB.getValue(columnId) as string).replace(/\D/g, ""), 10);
-                return numA - numB;
+                return Number(rowA.getValue(columnId)) - Number(rowB.getValue(columnId));
             },
             cell: ({ row }) => (
                 <div className="whitespace-nowrap ">
@@ -307,7 +305,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             ...prev,
             pageIndex: prev.pageIndex + factor
         }))
-    }, [pagination])
+    }, [])
 
     const studentsTableData = async (paginationData: any) => {
         const response = await fetch(

@@ -21,6 +21,7 @@ const SignOutDialog = () => {
   const pathname = usePathname();
   const lng = pathname.split("/")[1];
   const { t } = useTranslation(lng, "Language");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -31,16 +32,13 @@ const SignOutDialog = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button
-          type="button"
+        <p
           className="text-red-400 w-full justify-start gap-2 font-semibold"
-          size="sm"
-          variant="outline"
         >
-          <LogOut /> {t("logout")}
-        </Button>
+          {t("logout")}
+        </p>
       </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
@@ -50,10 +48,18 @@ const SignOutDialog = () => {
 
         <p>{t("logout_confirmation")}</p>
 
-        <DialogFooter>
+        <DialogFooter className="w-full flex flex-row justify-between space-x-2">
+          <Button
+            className="w-1/2"
+            type="button"
+            variant='ghost'
+            onClick={() => setIsDialogOpen(false)}
+          >
+            {t('cancel')}
+          </Button>
           <Button
             size="sm"
-            className="flex justify-center gap-2 font-semibold w-full"
+            className="w-1/2"
             onClick={handleClick}
             disabled={loading}
             variant="destructive"

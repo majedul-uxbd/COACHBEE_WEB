@@ -6,6 +6,7 @@ import React from "react";
 import { ModeToggle } from "../shared/mode-toggle";
 import { NavUser } from "./nav-user";
 import Image from "next/image";
+import Language from "./Language";
 
 const Header = ({ session }: { session: any }) => {
 	return (
@@ -17,8 +18,7 @@ const Header = ({ session }: { session: any }) => {
 				<nav className="hidden md:flex items-center gap-x-4">
 					<div className="flex flex-row items-center gap-x-4">
 						{/* <HousePlus className="h-5 w-5" /> */}
-						<img src="/coachbee/logo.png" alt="Logo" className="w-36 cursor-pointer mr-14 dark" />
-						{/* <Image src="/coachbee/logo.png" alt="Logo" width={32} height={32} /> */}
+						<Image src="/coachbee/logo.png" alt="Logo" width={144} height={56} className="w-36 cursor-pointer mr-14 dark" />
 						{/* <span className="text-lg font-semibold">ERP System</span> */}
 					</div>
 				</nav>
@@ -30,9 +30,10 @@ const Header = ({ session }: { session: any }) => {
 						<span className="text-lg font-semibold">ERP System</span>
 					</div>
 				</div>
-				<div className="flex">
+				<div className="flex items-center justify-center gap-4">
+					<Language />
 					<ModeToggle />
-					{/* <NavUser session={session?.user} /> */}
+					<NavUser session={session?.user} />
 				</div>
 			</div>
 		</header>

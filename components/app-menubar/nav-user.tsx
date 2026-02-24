@@ -2,6 +2,7 @@
 
 import {
     ChevronsUpDown,
+    CircleUserRound,
     LogOut,
     User2,
 } from "lucide-react";
@@ -19,43 +20,33 @@ import { Separator } from "../ui/separator";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { useProfileNameStore, useProfileStore } from "@/assets/store";
-import SignOutDialog from "../shared/logout-dialog";
+// import { useProfileNameStore, useProfileStore } from "@/assets/store";
 import { Badge } from "../ui/badge";
 import { ModeToggle } from "../shared/mode-toggle";
+import SignOutDialog from "../shared/SignoutDialog";
+import { se } from "date-fns/locale";
 
 export function NavUser({ session }: any) {
-    const imageUrl = useProfileStore((state: any) => state.imageUrl);
-    const full_name = useProfileNameStore((state: any) => state.ProfileName);
+    // const imageUrl = useProfileStore((state: any) => state.imageUrl);
+    // const fullName = useProfileNameStore((state: any) => state.ProfileName);
     const [popOverStage, setPopOverStage] = React.useState<boolean>(false);
 
+    // console.log('🚀 ~ nav-user.tsx:33 ~ session:', session);
     if (!session) return null; // Fallback if session is not available
 
     return (
         <Popover open={popOverStage} onOpenChange={setPopOverStage}>
             <PopoverTrigger asChild className="cursor-pointer" aria-label="User menu">
-                <div className="flex items-center ml-3">
+                <div className="flex items-center ">
                     <Avatar className="h-8 w-8 rounded-2xl">
                         <AvatarImage
-                            src={`${process.env.NEXT_PUBLIC_API_URL}/${imageUrl || session?.profile_pic}`}
-                            alt={full_name || session?.full_name || "User"}
+                            src={`${process.env.NEXT_PUBLIC_API_URL}/${session?.profile_img}`}
+                            alt={session?.fullName || "User"}
                         />
                         <AvatarFallback className="rounded-lg">
-                            <Image
-                                src="/placeholder-image.png"
-                                width={32}
-                                height={32}
-                                alt="Fallback image"
-                            />
+                            <CircleUserRound size={24} />
                         </AvatarFallback>
                     </Avatar>
-                    {/* <div className="ml-5 grid flex-1 text-left text-sm">
-                        <span className="truncate font-semibold">{full_name || session?.full_name}</span>
-                        <span className="truncate text-[11px] uppercase">
-                            {session?.designation_name || "Unknown"}
-                        </span>
-                    </div> */}
-                    {/* <ChevronsUpDown className="ml-auto size-4" /> */}
                 </div>
             </PopoverTrigger>
             <PopoverContent
@@ -65,26 +56,23 @@ export function NavUser({ session }: any) {
                 side="right"
             >
                 <div className="grid gap-2">
-                    <div className="flex items-center gap-4 p-2 rounded-lg">
+                    <div className="flex items-center gap-4 p-2 rounded-lg bg-accent">
                         <Avatar className="h-8 w-8 rounded-2xl">
                             <AvatarImage
-                                src={`${process.env.NEXT_PUBLIC_API_URL}/${imageUrl || session?.profile_pic}`}
-                                alt={full_name || session?.full_name || "User"}
+                                src={`${process.env.NEXT_PUBLIC_API_URL}/${session?.profile_img}`}
+                                alt={session?.fullName || "User"}
                             />
                             <AvatarFallback className="rounded-lg">
-                                <Image
-                                    src="/placeholder-image.png"
-                                    width={32}
-                                    height={32}
-                                    alt="Fallback image"
-                                />
+                                <CircleUserRound size={24} />
                             </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-start text-sm leading-tight">
-                            <span className="truncate font-semibold">{full_name || session?.full_name}</span>
-                            <span className="truncate text-[11px] uppercase">
-                                {session?.designation_name || "Unknown"}
-                            </span>
+                            <span className="truncate font-medium">{session?.fullName}</span>
+                            {session?.is_admin && (
+                                <Badge variant="default" className="text-xs mt-1">
+                                    Admin
+                                </Badge>
+                            )}
                         </div>
                     </div>
                     <Separator />
@@ -97,8 +85,8 @@ export function NavUser({ session }: any) {
                             Profile
                         </div>
                     </Link>
-                    <div className="pt-2 pb-2 pl-2 hover:bg-accent flex align-middle justify-start text-sm cursor-pointer rounded transition-colors duration-200">
-                        <LogOut className="h-5 w-5 mr-3" />
+                    <div className="pt-2 pb-2 pl-2 hover:bg-accent flex z-30  justify-between text-sm cursor-pointer rounded transition-colors duration-200">
+                        <LogOut className="h-5 w-5 mr-3 text-red-600" />
                         <SignOutDialog />
                     </div>
                 </div>
