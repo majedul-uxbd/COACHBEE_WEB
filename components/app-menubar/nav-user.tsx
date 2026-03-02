@@ -68,9 +68,14 @@ export function NavUser({ session }: any) {
                         </Avatar>
                         <div className="grid flex-1 text-start text-sm leading-tight">
                             <span className="truncate font-medium">{session?.fullName}</span>
-                            {session?.is_admin && (
+                            {session?.role === 'admin' && (
                                 <Badge variant="default" className="text-xs mt-1">
                                     Admin
+                                </Badge>
+                            )}
+                            {session?.role === 'super_admin' && (
+                                <Badge variant="default" className="text-xs mt-1">
+                                    Super Admin
                                 </Badge>
                             )}
                         </div>

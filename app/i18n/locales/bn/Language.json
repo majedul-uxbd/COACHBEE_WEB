@@ -1,7 +1,7 @@
 {
     "create": "তৈরি করুন",
     "creating": "তৈরি হচ্ছে",
-    "cancel": "বাতিল",
+    "cancel": "বাতিল করুন",
     "email": "ইমেইল",
     "password": "পাসওয়ার্ড",
     "student_id": "ছাত্র আইডি",
@@ -31,6 +31,20 @@
     "logging_out": "লগআউট হচ্ছে",
     "yes_log_out": "হ্যাঁ, লগআউট করুন",
     "monthly_fee_is_required": "মাসিক ফি প্রয়োজন",
-    "create_student": "ছাত্র তৈরি করুন",
-    "create_student_dialog_description": "নতুন ছাত্র তৈরি করতে নিচের বিবরণগুলি পূরণ করুন।"
+    "create_student": "শিক্ষার্থী তৈরি করুন",
+    "create_student_dialog_description": "নতুন শিক্ষার্থী তৈরি করতে নিচের বিবরণগুলি পূরণ করুন।",
+    "active": "সক্রিয়",
+    "inactive": "নিষ্ক্রিয়",
+    "student_status_dialog_title": "শিক্ষার্থীর অবস্থা পরিবর্তন করুন",
+    "student_status_dialog_description": "আপনি কি নিশ্চিত যে আপনি এই শিক্ষার্থীর অবস্থা পরিবর্তন করতে চান?",
+    "change": "পরিবর্তন করুন",
+    "changing": "পরিবর্তন হচ্ছে",
+    "delete": "মুছে ফেলুন",
+    "delete_student_dialog_title": "শিক্ষার্থীকে মুছে ফেলুন",
+    "delete_student_dialog_description": "আপনি কি নিশ্চিত যে আপনি এই শিক্ষার্থীকে মুছে ফেলতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফিরানো যাবে না।",
+    "deleting": "মুছে ফেলা হচ্ছে",
+    "update": "আপডেট করুন",
+    "updating": "আপডেট হচ্ছে",
+    "update_student_dialog_title": "শিক্ষার্থী তথ্য আপডেট করুন",
+    "update_student_dialog_description": "শিক্ষার্থী আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।"
 }

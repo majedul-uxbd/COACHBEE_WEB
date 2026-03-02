@@ -24,6 +24,8 @@ import {
 } from "../ui/tooltip";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import TeacherIcon from "../shared/set-teachers-icons";
 
 interface SidebarPageProps {
 	session: any;
@@ -142,7 +144,43 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								</p>
 							</MenuItem>
 						</Menu>
-						{/* Employees Menu Item */}
+
+						{/* Teachers Menu Item */}
+						<Menu menuItemStyles={{
+							button: {
+								'&:hover': {
+									backgroundColor: 'transparent', // removes hover color
+								},
+							},
+						}}>
+							<MenuItem
+								component={<Link href="/en/teachers" />}
+								className={cn(isActiveRoute("/en/teachers") && "bg-accent")}
+								icon={
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												{/* <UsersRound className="size-4" /> */}
+												<TeacherIcon />
+											</TooltipTrigger>
+											<TooltipContent
+												side="right"
+												align="center"
+												className="border p-2"
+											>
+												Teachers
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								}
+							>
+								<p className="text-[14px]">
+									Teachers
+								</p>
+							</MenuItem>
+						</Menu>
+
+						{/* Students Menu Item */}
 						<Menu menuItemStyles={{
 							button: {
 								'&:hover': {
@@ -175,7 +213,9 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								</p>
 							</MenuItem>
 						</Menu>
-						<Menu menuItemStyles={{
+
+
+						{/* <Menu menuItemStyles={{
 							button: {
 								'&:hover': {
 									backgroundColor: 'transparent', // removes hover color
@@ -298,7 +338,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 									</Link>
 								</MenuItem>
 							</SubMenu>
-						</Menu>
+						</Menu> */}
 					</>
 				</div>
 			</Sidebar >

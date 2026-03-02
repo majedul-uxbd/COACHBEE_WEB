@@ -8,7 +8,7 @@ declare module 'next-auth' {
         user_id: number;
         fullName: string;
         email: string;
-        is_admin: boolean;
+        role: string;
         profile_img: string | null;
     }
     interface Session {
@@ -47,7 +47,7 @@ const credentialsConfig = CredentialsProvider({
                     user_id: data?.data?.id,
                     fullName: data?.data?.fullName,
                     email: data?.data?.email,
-                    is_admin: data?.data?.is_admin,
+                    role: data?.data?.role,
                     profile_img: data?.data?.image_url,
                 };
             }
@@ -81,7 +81,7 @@ const config = {
                     session.user.user_id = responseData?.data?.id;
                     session.user.fullName = responseData?.data.full_name;
                     session.user.email = responseData?.data.email;
-                    session.user.is_admin = responseData?.data.is_admin;
+                    session.user.role = responseData?.data.role;
                     session.user.profile_img = responseData?.data.image_url;
                     session.user.id = token.sub!;
                 }

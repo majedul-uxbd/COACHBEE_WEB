@@ -37,6 +37,9 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Checkbox } from "../ui/checkbox";
 import CreateStudent from "./create-student";
+import ChangeStatusDialog from "./change-status";
+import DeleteStudentDialog from "./delete-student";
+import UpdateStudent from "./update-student";
 
 
 interface StudentsTableProps {
@@ -107,34 +110,34 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     );
 
     const columns: ColumnDef<Students>[] = [
-        {
-            accessorKey: "id",
-            header: ({ column }) => {
-                const isSorted = column.getIsSorted(); // 'asc' | 'desc' | false
-                return (
-                    <div className="flex items-center justify-center gap-2">
-                        {t("student_id")}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-4 w-4 p-0"
-                            onClick={() => column.toggleSorting(isSorted === "asc")}
-                        >
-                            <ArrowUpDown className="h-4 w-4" />
-                        </Button>
-                    </div>
-                )
-            },
-            enableSorting: true,
-            sortingFn: (rowA, rowB, columnId) => {
-                return Number(rowA.getValue(columnId)) - Number(rowB.getValue(columnId));
-            },
-            cell: ({ row }) => (
-                <div className="whitespace-nowrap ">
-                    {row.getValue("id")}
-                </div>
-            ),
-        },
+        // {
+        //     accessorKey: "id",
+        //     header: ({ column }) => {
+        //         const isSorted = column.getIsSorted(); // 'asc' | 'desc' | false
+        //         return (
+        //             <div className="flex items-center justify-center gap-2">
+        //                 {t("student_id")}
+        //                 <Button
+        //                     variant="ghost"
+        //                     size="icon"
+        //                     className="h-4 w-4 p-0"
+        //                     onClick={() => column.toggleSorting(isSorted === "asc")}
+        //                 >
+        //                     <ArrowUpDown className="h-4 w-4" />
+        //                 </Button>
+        //             </div>
+        //         )
+        //     },
+        //     enableSorting: true,
+        //     sortingFn: (rowA, rowB, columnId) => {
+        //         return Number(rowA.getValue(columnId)) - Number(rowB.getValue(columnId));
+        //     },
+        //     cell: ({ row }) => (
+        //         <div className="whitespace-nowrap ">
+        //             {row.getValue("id")}
+        //         </div>
+        //     ),
+        // },
 
         {
             accessorKey: "full_name",
@@ -151,17 +154,24 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             cell: ({ row }) => {
                 const className = row.getValue("class") as string;
                 const formattedClass = className.charAt(0).toUpperCase() + className.slice(1);
-                return <div className="whitespace-nowrap">{highlightText(formattedClass, globalFilter)}</div>;
+                return <div className="whitespace-nowrap">{formattedClass}</div>;
             },
         },
 
         {
             accessorKey: "guardian_phone",
             header: t("guardian_phone"),
-            cell: ({ row }) => {
-                const guardianPhone = row.getValue("guardian_phone") as string;
-                return <div className="whitespace-nowrap">{highlightText(guardianPhone, globalFilter)}</div>;
-            },
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{highlightText(row.getValue("guardian_phone") as string, globalFilter)}</div>
+            ),
+        },
+
+        {
+            accessorKey: "monthly_fee",
+            header: t("monthly_fee"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("monthly_fee")}</div>
+            ),
         },
 
         {
@@ -227,44 +237,12 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                             <DropdownMenuLabel className='text-center'>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
 
-                            {/* {isActive ? (
-                                <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                    <DeactivateEmployee
-                                        id={row.original.id}
-                                        accessToken={accessToken}
-                                        onInactiveSuccess={() => {
-                                            studentsTableData({
-                                                itemsPerPage: pagination.pageSize,
-                                                currentPageNumber: pagination.pageIndex,
-                                                sortOrder: "asc",
-                                                filterBy: "",
-                                            });
-                                        }}
-                                    />
-                                </div>
-                            ) : (
-                                <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                    <ActivateEmployee
-                                        id={row.original.id}
-                                        accessToken={accessToken}
-                                        onActiveSuccess={() => {
-                                            studentsTableData({
-                                                itemsPerPage: pagination.pageSize,
-                                                currentPageNumber: pagination.pageIndex,
-                                                sortOrder: "asc",
-                                                filterBy: "",
-                                            });
-                                        }}
-                                    />
-                                </div>
-                            )} */}
-
+                            {/* Update Student Data */}
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                Make Author
-                                {/* <ActivateEmployee
-                                    id={row.original.id}
+                                <UpdateStudent
                                     accessToken={accessToken}
-                                    onActiveSuccess={() => {
+                                    studentData={row.original}
+                                    onUpdateTable={() => {
                                         studentsTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
@@ -272,7 +250,40 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                                             filterBy: "",
                                         });
                                     }}
-                                /> */}
+                                />
+                            </div>
+
+                            {/* Change Student Status */}
+                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
+                                <ChangeStatusDialog
+                                    id={row.original.id}
+                                    accessToken={accessToken}
+                                    statusCode={row.getValue("is_active") == 1 ? 0 : 1}
+                                    onUpdateTable={() => {
+                                        studentsTableData({
+                                            itemsPerPage: pagination.pageSize,
+                                            currentPageNumber: pagination.pageIndex,
+                                            sortOrder: "desc",
+                                            filterBy: "",
+                                        });
+                                    }}
+                                />
+                            </div>
+
+                            {/* Delete Student Data */}
+                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
+                                <DeleteStudentDialog
+                                    id={row.original.id}
+                                    accessToken={accessToken}
+                                    onUpdateTable={() => {
+                                        studentsTableData({
+                                            itemsPerPage: pagination.pageSize,
+                                            currentPageNumber: pagination.pageIndex,
+                                            sortOrder: "desc",
+                                            filterBy: "",
+                                        });
+                                    }}
+                                />
                             </div>
 
                             {/* <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
@@ -426,7 +437,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                         </PopoverContent>
                     </Popover>
                     <CreateStudent
-                        session={session}
+                        session={accessToken}
                         onCreateSuccess={() => {
                             studentsTableData({
                                 itemsPerPage: pagination.pageSize,

@@ -32,5 +32,19 @@
     "yes_log_out": "Yes, log out",
     "monthly_fee_is_required": "Monthly fee is required",
     "create_student": "Create Student",
-    "create_student_dialog_description": "Fill in the details below to create a new student."
+    "create_student_dialog_description": "Fill in the details below to create a new student.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "student_status_dialog_title": "Change Student Status",
+    "student_status_dialog_description": "Are you sure you want to change the status of this student?",
+    "change": "Change",
+    "changing": "Changing",
+    "delete": "Delete",
+    "delete_student_dialog_title": "Delete Student",
+    "delete_student_dialog_description": "Are you sure you want to delete this student? This action cannot be undone.",
+    "deleting": "Deleting",
+    "update": "Update",
+    "updating": "Updating",
+    "update_student_dialog_title": "Update Student",
+    "update_student_dialog_description": "Fill in the details below to update the student."
 }

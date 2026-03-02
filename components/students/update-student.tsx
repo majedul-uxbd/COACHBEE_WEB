@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, SquarePlus } from "lucide-react";
+import { Edit, Loader2, SquarePlus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -39,19 +39,19 @@ const ClassList = {
     "Twelve": "twelve"
 }
 
-interface CreateStudentProps {
-    session: any;
-    onCreateSuccess(): void;
+interface UpdateStudentProps {
+    accessToken: any;
+    studentData: any
+    onUpdateTable(): void;
 }
-const CreateStudent = ({
-    session, onCreateSuccess }: CreateStudentProps) => {
-    const authToken = session;
+const UpdateStudent = ({ accessToken, studentData, onUpdateTable }: UpdateStudentProps) => {
+    const authToken = accessToken;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
     const pathname = usePathname();
     const lng = pathname.split('/')[1];
     const { t } = useTranslation(lng, 'Language');
-    const CreateSchema = z.object({
+    const UpdateSchema = z.object({
         fullName: z
             .string()
             .min(1, { message: t('fullname_is_required') })
@@ -76,23 +76,23 @@ const CreateStudent = ({
         }),
     });
 
-    const form = useForm<z.infer<typeof CreateSchema>>({
-        resolver: zodResolver(CreateSchema),
+    const form = useForm<z.infer<typeof UpdateSchema>>({
+        resolver: zodResolver(UpdateSchema),
         defaultValues: {
-            fullName: '',
-            class: '',
-            guardianPhone: '',
-            address: '',
-            monthly_fee: ""
+            fullName: studentData.full_name || '',
+            class: studentData.class || '',
+            guardianPhone: studentData.guardian_phone || '',
+            address: studentData.address || '',
+            monthly_fee: studentData.monthly_fee || ""
         },
     });
 
 
-    const onSubmit = async (values: z.infer<typeof CreateSchema>) => {
-        console.log('🚀 ~ create-student.tsx:99 ~ values:', values);
+    const onSubmit = async (values: z.infer<typeof UpdateSchema>) => {
+        console.log('🚀 ~ update-student.tsx:99 ~ values:', values);
         setButtonDisable(true);
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/students/create`,
+            `${process.env.NEXT_PUBLIC_API_URL}/students/update`,
             {
                 method: 'POST',
                 headers: {
@@ -101,21 +101,22 @@ const CreateStudent = ({
                 },
                 body: JSON.stringify({
                     lg: lng,
+                    id: studentData.id,
                     fullName: values.fullName,
                     class: values.class,
                     guardianPhone: values.guardianPhone,
                     address: values.address,
-                    monthly_fee: values.monthly_fee
+                    monthly_fee: values.monthly_fee,
                 }),
             }
         );
 
         const responseData = await response.json();
-        // console.log('🚀 ~ create-student.tsx:107 ~ responseData:', responseData);
+        console.log('🚀 ~ update-student.tsx:107 ~ responseData:', responseData);
         if (responseData.status === 'success') {
             toast.success(responseData?.message);
             form.reset();
-            onCreateSuccess();
+            onUpdateTable();
             setIsDialogOpen(false);
         } else {
             toast.error(responseData.message);
@@ -126,19 +127,24 @@ const CreateStudent = ({
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-blue-700 hover:bg-blue-800 dark:bg-blue-400 dark:hover:bg-blue-500">
-                    <SquarePlus className="font-bold" size={20} />
-                    {t('create_student')}
+                <Button
+                    variant="ghost"
+                    className="w-full flex justify-start text-left text-xs text-accent-foreground"
+                >
+                    <div className="flex items-center -ml-1.5 gap-2">
+                        <Edit className="h-4 w-4" />
+                        <span>{t("update")}</span>
+                    </div>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-106">
                 {/* Header Section */}
                 <DialogHeader className="items-center">
                     <DialogTitle className="text-2xl font-semibold text-accent-foreground">
-                        {t('create_student')}
+                        {t('update_student_dialog_title')}
                     </DialogTitle>
                     <DialogDescription className="text-gray-500">
-                        {t('create_student_dialog_description')}
+                        {t('update_student_dialog_description')}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -222,7 +228,7 @@ const CreateStudent = ({
                                 )}
                             />
 
-                            {/* Address Field */}
+                            {/* Monthly_Fees Field */}
                             <FormField
                                 control={form.control}
                                 name="monthly_fee"
@@ -232,7 +238,7 @@ const CreateStudent = ({
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                type="number"
+
                                                 placeholder={t('monthly_fee_hint')}
                                             />
                                         </FormControl>
@@ -256,7 +262,7 @@ const CreateStudent = ({
                                 variant="default"
                                 disabled={buttonDisable}
                             >
-                                {buttonDisable ? t('creating') : t('create')}
+                                {buttonDisable ? t('updating') : t('update')}
                                 {buttonDisable && (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                 )}
@@ -270,4 +276,4 @@ const CreateStudent = ({
     );
 }
 
-export default CreateStudent;
+export default UpdateStudent;
