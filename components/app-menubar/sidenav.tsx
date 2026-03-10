@@ -3,6 +3,7 @@
 import {
 	BriefcaseBusiness,
 	ChartLine,
+	CircleDollarSign,
 	LayoutDashboard,
 	Map,
 	MapPin,
@@ -298,7 +299,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 									</Link>
 								</MenuItem>
 							</SubMenu>
-						</Menu>
+						</Menu>*/}
 						<Menu menuItemStyles={{
 							button: {
 								'&:hover': {
@@ -329,16 +330,16 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								<MenuItem className="dark:bg-black">
 									<Link
 										className={cn(
-											isActiveRoute("/hrm-module/salary-structure") && "bg-accent p-2 cursor-pointer",
+											isActiveRoute("/en/salary") && "bg-accent p-2 cursor-pointer",
 											"flex items-center text-[13px] gap-2"
 										)}
-										href="/hrm-module/salary-structure"
+										href="/en/salary"
 									>
-										<ChartLine className="size-4" /> Salary Structure
+										<CircleDollarSign className="size-4" /> Salary
 									</Link>
 								</MenuItem>
 							</SubMenu>
-						</Menu> */}
+						</Menu>
 					</>
 				</div>
 			</Sidebar >

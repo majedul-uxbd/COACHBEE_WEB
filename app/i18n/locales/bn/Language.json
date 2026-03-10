@@ -46,5 +46,17 @@
     "update": "আপডেট করুন",
     "updating": "আপডেট হচ্ছে",
     "update_student_dialog_title": "শিক্ষার্থী তথ্য আপডেট করুন",
-    "update_student_dialog_description": "শিক্ষার্থী আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।"
+    "update_student_dialog_description": "শিক্ষার্থী আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।",
+    "teacher_status_dialog_title": "শিক্ষকের অবস্থা পরিবর্তন করুন",
+    "teacher_status_dialog_description": "আপনি কি নিশ্চিত যে আপনি এই শিক্ষকের অবস্থা পরিবর্তন করতে চান?",
+    "delete_teacher_dialog_title": "শিক্ষককে মুছে ফেলুন",
+    "delete_teacher_dialog_description": "আপনি কি নিশ্চিত যে আপনি এই শিক্ষককে মুছে ফেলতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফিরানো যাবে না।",
+    "create_teacher": "শিক্ষক তৈরি করুন",
+    "create_teacher_dialog_description": "নতুন শিক্ষক তৈরি করতে নিচের বিবরণগুলি পূরণ করুন।",
+    "salary": "বেতন",
+    "salary_hint": "বেতন লিখুন",
+    "phone": "ফোন",
+    "phone_hint": "ফোন নম্বর লিখুন",
+    "maximum_length_class": "সর্বোচ্চ দৈর্ঘ্য 150 অক্ষর",
+    "no_class_found": "কোন ক্লাস পাওয়া যায়নি"
 }

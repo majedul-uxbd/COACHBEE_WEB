@@ -28,21 +28,22 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizontalIcon, Settings2 } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizontalIcon, Settings2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Students } from "@/interfaces/students.interface";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Checkbox } from "../ui/checkbox";
-import CreateStudent from "./create-student";
 import ChangeStatusDialog from "./change-status";
-import DeleteStudentDialog from "./delete-student";
-import UpdateStudent from "./update-student";
+import UpdateStudent from "./update-teacher";
+import { Teachers } from "@/interfaces/teachers.interface";
+import CreateTeacher from "./create-teacher";
+import DeleteTeacherDialog from "./delete-teacher";
+import UpdateTeacher from "./update-teacher";
 
 
-interface StudentsTableProps {
+interface TeachersTableProps {
     session: any;
 }
 
@@ -80,10 +81,10 @@ const highlightText = (text: string, search: string) => {
     );
 };
 
-const StudentsTable = ({ session }: StudentsTableProps) => {
+const TeachersTable = ({ session }: TeachersTableProps) => {
     const accessToken = session?.user?.id;
     // console.log('🚀 ~ student-table.tsx:71 ~ accessToken:', accessToken);
-    const [data, setData] = useState<Students[]>([]);
+    const [data, setData] = useState<Teachers[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
@@ -109,7 +110,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         }
     );
 
-    const columns: ColumnDef<Students>[] = [
+    const columns: ColumnDef<Teachers>[] = [
         // {
         //     accessorKey: "id",
         //     header: ({ column }) => {
@@ -152,25 +153,25 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             accessorKey: "class",
             header: t("class"),
             cell: ({ row }) => {
-                const className = row.getValue("class") as string;
-                const formattedClass = className.charAt(0).toUpperCase() + className.slice(1);
-                return <div className="whitespace-nowrap text-start">{highlightText(formattedClass, globalFilter)}</div>;
+                const classArray = JSON.parse(row.getValue("class") as string) as string[];;
+                const formattedClass = classArray.map(className => className.charAt(0).toUpperCase() + className.slice(1)).join(", ");
+                return <div className="whitespace-nowrap">{formattedClass}</div>;
             },
         },
 
         {
-            accessorKey: "guardian_phone",
-            header: t("guardian_phone"),
+            accessorKey: "phone",
+            header: t("phone"),
             cell: ({ row }) => (
-                <div className="whitespace-nowrap ">{highlightText(row.getValue("guardian_phone") as string, globalFilter)}</div>
+                <div className="whitespace-nowrap ">{highlightText(row.getValue("phone") as string, globalFilter)}</div>
             ),
         },
 
         {
-            accessorKey: "monthly_fee",
-            header: t("monthly_fee"),
+            accessorKey: "salary",
+            header: t("salary"),
             cell: ({ row }) => (
-                <div className="whitespace-nowrap ">{row.getValue("monthly_fee")}</div>
+                <div className="whitespace-nowrap ">{row.getValue("salary")}</div>
             ),
         },
 
@@ -239,11 +240,11 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
 
                             {/* Update Student Data */}
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <UpdateStudent
+                                <UpdateTeacher
                                     accessToken={accessToken}
-                                    studentData={row.original}
+                                    teacherData={row.original}
                                     onUpdateTable={() => {
-                                        studentsTableData({
+                                        teachersTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
                                             sortOrder: "asc",
@@ -260,7 +261,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                                     accessToken={accessToken}
                                     statusCode={row.getValue("is_active") == 1 ? 0 : 1}
                                     onUpdateTable={() => {
-                                        studentsTableData({
+                                        teachersTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
                                             sortOrder: "desc",
@@ -272,11 +273,11 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
 
                             {/* Delete Student Data */}
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <DeleteStudentDialog
+                                <DeleteTeacherDialog
                                     id={row.original.id}
                                     accessToken={accessToken}
                                     onUpdateTable={() => {
-                                        studentsTableData({
+                                        teachersTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
                                             sortOrder: "desc",
@@ -318,9 +319,9 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         }))
     }, [])
 
-    const studentsTableData = async (paginationData: any) => {
+    const teachersTableData = async (paginationData: any) => {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/students/table-data`,
+            `${process.env.NEXT_PUBLIC_API_URL}/teachers/table-data`,
             {
                 method: 'POST',
                 headers: {
@@ -336,7 +337,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         if (response.ok) {
             const responseData = await response.json();
             // console.log('🚀 ~ student-table.tsx:319 ~ responseData:', responseData);
-            const studentData = responseData?.data?.tableData as Students[];
+            const studentData = responseData?.data?.tableData as Teachers[];
             const pageCount = Math.ceil(responseData?.data?.metadata?.totalRows / pagination.pageSize);
             if (pageCount === 0) {
                 setTotalPage(() => 1);
@@ -365,7 +366,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     }, [columnVisibility]);
 
     useEffect(() => {
-        studentsTableData({
+        teachersTableData({
             itemsPerPage: pagination.pageSize,
             currentPageNumber: pagination.pageIndex,
             sortOrder: "desc",
@@ -436,10 +437,10 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                             </ScrollArea>
                         </PopoverContent>
                     </Popover>
-                    <CreateStudent
+                    <CreateTeacher
                         session={accessToken}
                         onCreateSuccess={() => {
-                            studentsTableData({
+                            teachersTableData({
                                 itemsPerPage: pagination.pageSize,
                                 currentPageNumber: pagination.pageIndex,
                                 sortOrder: "desc",
@@ -578,4 +579,4 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     )
 }
 
-export default StudentsTable;
+export default TeachersTable;
