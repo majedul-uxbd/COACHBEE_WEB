@@ -56,11 +56,11 @@ const DeleteStudentDialog = ({
 				}
 			);
 
-			toast.success(response.data.message || "Status changed successfully");
+			toast.success(response.data.message || "Student deleted successfully");
 			setOpen(false);
 			onUpdateTable();
 		} catch (error: any) {
-			console.error("Failed to add employee", error);
+			console.error("Failed to delete student", error);
 
 			if (error.response && error.response.data) {
 				const msg =

@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/";
 import { HousePlus } from "lucide-react";
-import React from "react";
 import { ModeToggle } from "../shared/mode-toggle";
 import { NavUser } from "./nav-user";
 import Image from "next/image";
