@@ -46,21 +46,6 @@ interface StudentsTableProps {
     session: any;
 }
 
-// const ClassList = {
-//     "One": "one",
-//     "Two": "two",
-//     "Three": "three",
-//     "Four": "four",
-//     "Five": "five",
-//     "Six": "six",
-//     "Seven": "seven",
-//     "Eight": "eight",
-//     "Nine": "nine",
-//     "Ten": "ten",
-//     "Eleven": "eleven",
-//     "Twelve": "twelve"
-// }
-
 const highlightText = (text: string, search: string) => {
     if (!search) return text;
     const regex = new RegExp(`(${search})`, "gi");
@@ -84,6 +69,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     const accessToken = session?.user?.id;
     // console.log('🚀 ~ student-table.tsx:71 ~ accessToken:', accessToken);
     const [data, setData] = useState<Students[]>([]);
+    const [classes, setClasses] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
@@ -107,6 +93,10 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             }
             return {};
         }
+    );
+
+    const classMap = Object.fromEntries(
+        classes.map((cls: any) => [cls.id, cls.class_name])
     );
 
     const columns: ColumnDef<Students>[] = [
@@ -152,9 +142,31 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             accessorKey: "class",
             header: t("class"),
             cell: ({ row }) => {
-                const className = row.getValue("class") as string;
-                const formattedClass = className.charAt(0).toUpperCase() + className.slice(1);
-                return <div className="whitespace-nowrap text-start">{highlightText(formattedClass, globalFilter)}</div>;
+                const classString = row.getValue("class");
+
+                let classArray: number[] = [];
+
+                // 🔥 Handle both string and array (future-proof)
+                if (typeof classString === "string") {
+                    try {
+                        classArray = JSON.parse(classString);
+                    } catch {
+                        classArray = [];
+                    }
+                } else if (Array.isArray(classString)) {
+                    classArray = classString;
+                }
+
+                const formattedClass = classArray
+                    .map((id: number) => classMap[id])
+                    .filter(Boolean)
+                    .join(", ");
+
+                return (
+                    <div className="whitespace-nowrap">
+                        {formattedClass || "N/A"}
+                    </div>
+                );
             },
         },
 
@@ -241,6 +253,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
                                 <UpdateStudent
                                     accessToken={accessToken}
+                                    classes={classes}
                                     studentData={row.original}
                                     onUpdateTable={() => {
                                         studentsTableData({
@@ -357,7 +370,31 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
 
     }
 
+    const classList = async () => {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/common/class-list`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    lg: lng
+                })
+            },
+        );
+        if (response.ok) {
+            const responseData = await response.json();
+            setClasses(responseData?.data);
+        }
+        else {
+            console.error("fetch req failed: ", response)
+        }
+    }
+
     useEffect(() => {
+        classList();
         localStorage.setItem(
             "storeTableColumnVisibility",
             JSON.stringify(columnVisibility)
@@ -438,6 +475,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                     </Popover>
                     <CreateStudent
                         session={accessToken}
+                        classes={classes}
                         onCreateSuccess={() => {
                             studentsTableData({
                                 itemsPerPage: pagination.pageSize,

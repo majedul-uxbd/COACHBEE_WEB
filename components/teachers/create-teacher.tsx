@@ -26,27 +26,14 @@ import { Checkbox } from "../ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 
-const ClassList = {
-    "One": "one",
-    "Two": "two",
-    "Three": "three",
-    "Four": "four",
-    "Five": "five",
-    "Six": "six",
-    "Seven": "seven",
-    "Eight": "eight",
-    "Nine": "nine",
-    "Ten": "ten",
-    "Eleven": "eleven",
-    "Twelve": "twelve"
-}
 
 interface CreateTeacherProps {
+    classes: any
     session: any;
     onCreateSuccess(): void;
 }
 const CreateTeacher = ({
-    session, onCreateSuccess }: CreateTeacherProps) => {
+    session, classes, onCreateSuccess }: CreateTeacherProps) => {
     const authToken = session;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
@@ -59,14 +46,9 @@ const CreateTeacher = ({
             .min(1, { message: t('fullname_is_required') })
             .max(100, { message: t('maximum_length_name') }),
 
-        class: z
-            .array(
-                z
-                    .string()
-                    // .min(1, { message: t("class_is_required") })
-                    .max(150, { message: t("maximum_length_class") })
-            )
-        // .min(1, { message: t("class_is_required") }),
+        class: z.array(
+            z.number()
+        ).min(1, { message: t("class_is_required") })
         ,
         phone: z.string().refine((val) => isValidPhoneNumber(val), {
             message: t('invalid_phone_number'),
@@ -191,20 +173,20 @@ const CreateTeacher = ({
                                                     <CommandList>
                                                         <CommandEmpty>No classes found</CommandEmpty>
                                                         <CommandGroup className="grid grid-cols-2 gap-2">
-                                                            {Object.entries(ClassList).map(([key, value]) => {
-                                                                const isSelected = field.value?.includes(value);
+                                                            {classes.map((cls: any) => {
+                                                                const isSelected = field.value?.includes(cls.id);
                                                                 return (
                                                                     <CommandItem
-                                                                        key={value}
+                                                                        key={cls.id}
                                                                         onSelect={() =>
                                                                             isSelected
-                                                                                ? field.onChange(field.value.filter((v) => v !== value))
-                                                                                : field.onChange([...(field.value || []), value])
+                                                                                ? field.onChange(field.value.filter((v: number) => v !== cls.id))
+                                                                                : field.onChange([...(field.value || []), cls.id])
                                                                         }
                                                                         className="flex items-center"
                                                                     >
                                                                         <Checkbox checked={isSelected} className="mr-2" />
-                                                                        {key}
+                                                                        {cls.class_name}
                                                                     </CommandItem>
                                                                 );
                                                             })}

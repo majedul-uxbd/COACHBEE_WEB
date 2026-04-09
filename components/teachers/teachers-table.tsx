@@ -47,20 +47,6 @@ interface TeachersTableProps {
     session: any;
 }
 
-// const ClassList = {
-//     "One": "one",
-//     "Two": "two",
-//     "Three": "three",
-//     "Four": "four",
-//     "Five": "five",
-//     "Six": "six",
-//     "Seven": "seven",
-//     "Eight": "eight",
-//     "Nine": "nine",
-//     "Ten": "ten",
-//     "Eleven": "eleven",
-//     "Twelve": "twelve"
-// }
 
 const highlightText = (text: string, search: string) => {
     if (!search) return text;
@@ -85,6 +71,7 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
     const accessToken = session?.user?.id;
     // console.log('🚀 ~ student-table.tsx:71 ~ accessToken:', accessToken);
     const [data, setData] = useState<Teachers[]>([]);
+    const [classes, setClasses] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
@@ -108,6 +95,10 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
             }
             return {};
         }
+    );
+
+    const classMap = Object.fromEntries(
+        classes.map((cls: any) => [cls.id, cls.class_name])
     );
 
     const columns: ColumnDef<Teachers>[] = [
@@ -153,9 +144,31 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
             accessorKey: "class",
             header: t("class"),
             cell: ({ row }) => {
-                const classArray = JSON.parse(row.getValue("class") as string) as string[];;
-                const formattedClass = classArray.map(className => className.charAt(0).toUpperCase() + className.slice(1)).join(", ");
-                return <div className="whitespace-nowrap">{formattedClass}</div>;
+                const classString = row.getValue("class");
+
+                let classArray: number[] = [];
+
+                // 🔥 Handle both string and array (future-proof)
+                if (typeof classString === "string") {
+                    try {
+                        classArray = JSON.parse(classString);
+                    } catch {
+                        classArray = [];
+                    }
+                } else if (Array.isArray(classString)) {
+                    classArray = classString;
+                }
+
+                const formattedClass = classArray
+                    .map((id: number) => classMap[id])
+                    .filter(Boolean)
+                    .join(", ");
+
+                return (
+                    <div className="whitespace-nowrap">
+                        {formattedClass || "N/A"}
+                    </div>
+                );
             },
         },
 
@@ -243,6 +256,7 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
                                 <UpdateTeacher
                                     accessToken={accessToken}
                                     teacherData={row.original}
+                                    classes={classes}
                                     onUpdateTable={() => {
                                         teachersTableData({
                                             itemsPerPage: pagination.pageSize,
@@ -351,11 +365,36 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
             }
             setData(() => studentData);
             setIsLoading(false)
+            console.log('🚀 ~ teachersTableData ~ data:', data);
         }
         else {
             console.error("fetch req failed: ", response)
         }
 
+    }
+
+    const classList = async () => {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/common/class-list`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    lg: lng
+                })
+            },
+        );
+        if (response.ok) {
+            const responseData = await response.json();
+            setClasses(responseData?.data);
+            // console.log('🚀 ~ classList ~ classes:', classes);
+        }
+        else {
+            console.error("fetch req failed: ", response)
+        }
     }
 
     useEffect(() => {
@@ -366,12 +405,13 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
     }, [columnVisibility]);
 
     useEffect(() => {
+        classList();
         teachersTableData({
             itemsPerPage: pagination.pageSize,
             currentPageNumber: pagination.pageIndex,
             sortOrder: "desc",
             filterBy: ""
-        })
+        });
     }, [pagination]);
 
     const table = useReactTable({
@@ -438,6 +478,7 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
                         </PopoverContent>
                     </Popover>
                     <CreateTeacher
+                        classes={classes}
                         session={accessToken}
                         onCreateSuccess={() => {
                             teachersTableData({

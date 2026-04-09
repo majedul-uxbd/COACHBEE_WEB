@@ -23,6 +23,9 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import 'react-phone-number-input/style.css';
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
+import { Checkbox } from "../ui/checkbox";
 
 const ClassList = {
     "One": "one",
@@ -41,10 +44,11 @@ const ClassList = {
 
 interface CreateStudentProps {
     session: any;
+    classes: any;
     onCreateSuccess(): void;
 }
 const CreateStudent = ({
-    session, onCreateSuccess }: CreateStudentProps) => {
+    session, classes, onCreateSuccess }: CreateStudentProps) => {
     const authToken = session;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
@@ -57,10 +61,9 @@ const CreateStudent = ({
             .min(1, { message: t('fullname_is_required') })
             .max(100, { message: t('maximum_length_name') }),
 
-        class: z
-            .string()
-            .min(1, { message: t('class_is_required') })
-            .max(60, { message: t('maximum_length_class') }),
+        class: z.array(
+            z.number()
+        ).min(1, { message: t("class_is_required") }),
 
         guardianPhone: z.string().refine((val) => isValidPhoneNumber(val), {
             message: t('invalid_phone_number'),
@@ -80,7 +83,7 @@ const CreateStudent = ({
         resolver: zodResolver(CreateSchema),
         defaultValues: {
             fullName: '',
-            class: '',
+            class: [],
             guardianPhone: '',
             address: '',
             monthly_fee: ""
@@ -164,22 +167,52 @@ const CreateStudent = ({
                                 control={form.control}
                                 name="class"
                                 render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('class')}</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl className="w-full">
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a Region" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {Object.entries(ClassList).map(([key, value]) => (
-                                                    <SelectItem key={key} value={value}>
-                                                        {key}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel>{t("class")}</FormLabel>
+
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        className="justify-between"
+                                                    >
+                                                        {field.value?.length ? field.value.join(", ") : "Select classes"}
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+
+                                            <PopoverContent className="w-full p-0 max-h-60">
+                                                <Command>
+                                                    {/* Search input */}
+                                                    <CommandInput placeholder="Search classes..." />
+                                                    <CommandList>
+                                                        <CommandEmpty>No classes found</CommandEmpty>
+                                                        <CommandGroup className="grid grid-cols-2 gap-2">
+                                                            {classes.map((cls: any) => {
+                                                                const isSelected = field.value?.includes(cls.id);
+                                                                return (
+                                                                    <CommandItem
+                                                                        key={cls.id}
+                                                                        onSelect={() =>
+                                                                            isSelected
+                                                                                ? field.onChange(field.value.filter((v: number) => v !== cls.id))
+                                                                                : field.onChange([...(field.value || []), cls.id])
+                                                                        }
+                                                                        className="flex items-center"
+                                                                    >
+                                                                        <Checkbox checked={isSelected} className="mr-2" />
+                                                                        {cls.class_name}
+                                                                    </CommandItem>
+                                                                );
+                                                            })}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
+
                                         <FormMessage />
                                     </FormItem>
                                 )}

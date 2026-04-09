@@ -26,38 +26,39 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 import { Checkbox } from "../ui/checkbox";
 
-const ClassList = {
-    "One": "one",
-    "Two": "two",
-    "Three": "three",
-    "Four": "four",
-    "Five": "five",
-    "Six": "six",
-    "Seven": "seven",
-    "Eight": "eight",
-    "Nine": "nine",
-    "Ten": "ten",
-    "Eleven": "eleven",
-    "Twelve": "twelve"
-}
 
 interface UpdateTeacherProps {
     accessToken: any;
     teacherData: any
+    classes: any
     onUpdateTable(): void;
 }
-const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeacherProps) => {
+const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: UpdateTeacherProps) => {
     const authToken = accessToken;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
+
     const pathname = usePathname();
     const lng = pathname.split('/')[1];
     const { t } = useTranslation(lng, 'Language');
-    const defaultClassValues = Array.isArray(teacherData.class)
-        ? teacherData.class.map((c: string) => c.toLowerCase().trim())
-        : teacherData.class
-            ? [teacherData.class.toLowerCase().trim()]
-            : [];
+
+    // ✅ 🔥 FIX: Properly parse class from string "[1,2,3]"
+    let defaultClassValues: number[] = [];
+
+    try {
+        if (typeof teacherData.class === "string") {
+            defaultClassValues = JSON.parse(teacherData.class);
+        } else if (Array.isArray(teacherData.class)) {
+            defaultClassValues = teacherData.class;
+        }
+    } catch {
+        defaultClassValues = [];
+    }
+
+    // ✅ Map for quick lookup
+    const classMap = Object.fromEntries(
+        classes.map((cls: any) => [cls.id, cls.class_name])
+    );
 
     const UpdateSchema = z.object({
         fullName: z
@@ -65,15 +66,8 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
             .min(1, { message: t('fullname_is_required') })
             .max(100, { message: t('maximum_length_name') }),
 
-        class: z
-            .array(
-                z
-                    .string()
-                    // .min(1, { message: t("class_is_required") })
-                    .max(150, { message: t("maximum_length_class") })
-            )
-        // .min(1, { message: t("class_is_required") }),
-        ,
+        class: z.array(z.number()).min(1, { message: t("class_is_required") }),
+
         phone: z.string().refine((val) => isValidPhoneNumber(val), {
             message: t('invalid_phone_number'),
         }),
@@ -97,9 +91,9 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
         },
     });
 
-
     const onSubmit = async (values: z.infer<typeof UpdateSchema>) => {
         setButtonDisable(true);
+
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/teachers/update`,
             {
@@ -112,7 +106,7 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
                     lg: lng,
                     id: teacherData.id,
                     fullName: values.fullName,
-                    class: values.class,
+                    class: values.class, // ✅ sending number[]
                     phone: values.phone,
                     address: values.address,
                     salary: values.salary,
@@ -121,6 +115,7 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
         );
 
         const responseData = await response.json();
+
         if (responseData.status === 'success') {
             toast.success(responseData?.message);
             form.reset();
@@ -129,6 +124,7 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
         } else {
             toast.error(responseData.message);
         }
+
         setButtonDisable(false);
     };
 
@@ -142,6 +138,7 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
                     </div>
                 </Button>
             </DialogTrigger>
+
             <DialogContent className="sm:max-w-106">
                 <DialogHeader className="items-center">
                     <DialogTitle className="text-2xl font-semibold text-accent-foreground">
@@ -151,8 +148,10 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
                         {t('update_teacher_dialog_description')}
                     </DialogDescription>
                 </DialogHeader>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
                         <div className="space-y-4 overflow-auto">
 
                             {/* Full Name */}
@@ -166,51 +165,88 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
                                 </FormItem>
                             )} />
 
-                            {/* Class */}
-                            <FormField control={form.control} name="class" render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>{t("class")}</FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button variant="outline" role="combobox" className="justify-between">
-                                                    {field.value.length ? field.value.join(", ") : "Select classes"}
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-full p-0 max-h-60">
-                                            <Command>
-                                                <CommandInput placeholder="Search classes..." />
-                                                <CommandList>
-                                                    <CommandEmpty>No classes found</CommandEmpty>
-                                                    <CommandGroup className="grid grid-cols-2 gap-2">
-                                                        {Object.entries(ClassList).map(([key, value]) => {
-                                                            const isSelected = Array.isArray(field.value) && field.value.includes(value);
-                                                            return (
-                                                                <CommandItem
-                                                                    key={value}
-                                                                    onSelect={() => {
-                                                                        if (isSelected) {
-                                                                            field.onChange(field.value.filter(v => v !== value));
-                                                                        } else {
-                                                                            field.onChange([...field.value, value]);
-                                                                        }
-                                                                    }}
-                                                                    className="flex items-center"
-                                                                >
-                                                                    <Checkbox checked={isSelected} className="mr-2" />
-                                                                    {key}
-                                                                </CommandItem>
-                                                            );
-                                                        })}
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
+                            {/* ✅ CLASS SELECT */}
+                            <FormField
+                                control={form.control}
+                                name="class"
+                                render={({ field }) => {
+                                    const selectedValues = Array.isArray(field.value) ? field.value : [];
+
+                                    return (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>{t("class")}</FormLabel>
+
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className="justify-between flex-wrap h-auto min-h-10"
+                                                        >
+                                                            {selectedValues.length > 0 ? (
+                                                                <div className="flex flex-wrap gap-1">
+                                                                    {selectedValues.map((id: number) => (
+                                                                        <span
+                                                                            key={id}
+                                                                            className="bg-muted px-2 py-1 rounded text-xs"
+                                                                        >
+                                                                            {classMap[id]}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                "Select classes"
+                                                            )}
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+
+                                                <PopoverContent className="w-full p-0">
+                                                    <Command>
+                                                        <CommandInput placeholder="Search classes..." />
+
+                                                        <CommandList className="max-h-60 overflow-y-auto">
+                                                            <CommandEmpty>No classes found</CommandEmpty>
+
+                                                            <CommandGroup>
+                                                                {classes.map((cls: any) => {
+                                                                    const isSelected = selectedValues.includes(cls.id);
+
+                                                                    return (
+                                                                        <CommandItem
+                                                                            key={cls.id}
+                                                                            onSelect={() => {
+                                                                                let updatedValues;
+
+                                                                                if (isSelected) {
+                                                                                    updatedValues = selectedValues.filter(
+                                                                                        (v: number) => v !== cls.id
+                                                                                    );
+                                                                                } else {
+                                                                                    updatedValues = [...selectedValues, cls.id];
+                                                                                }
+
+                                                                                field.onChange(updatedValues);
+                                                                            }}
+                                                                            className="flex items-center gap-2"
+                                                                        >
+                                                                            <Checkbox checked={isSelected} />
+                                                                            {cls.class_name}
+                                                                        </CommandItem>
+                                                                    );
+                                                                })}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
+                            />
 
                             {/* Phone */}
                             <FormField control={form.control} name="phone" render={({ field }) => (
@@ -253,20 +289,27 @@ const UpdateTeacher = ({ accessToken, teacherData, onUpdateTable }: UpdateTeache
                             )} />
 
                         </div>
+
                         <DialogFooter className="w-full flex flex-row justify-between space-x-2">
                             <Button className="w-1/2" type="button" variant='ghost' onClick={() => setIsDialogOpen(false)}>
                                 {t('cancel')}
                             </Button>
-                            <Button className="w-1/2 flex items-center justify-center gap-2" type="submit" variant="default" disabled={buttonDisable}>
+
+                            <Button
+                                className="w-1/2 flex items-center justify-center gap-2"
+                                type="submit"
+                                disabled={buttonDisable}
+                            >
                                 {buttonDisable ? t('updating') : t('update')}
                                 {buttonDisable && <Loader2 className="h-4 w-4 animate-spin" />}
                             </Button>
                         </DialogFooter>
+
                     </form>
                 </Form>
             </DialogContent>
         </Dialog>
     );
-}
+};
 
 export default UpdateTeacher;

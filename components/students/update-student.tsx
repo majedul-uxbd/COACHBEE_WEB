@@ -12,9 +12,8 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Edit, Loader2, SquarePlus } from "lucide-react";
+import { Edit, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -23,44 +22,46 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import 'react-phone-number-input/style.css';
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
-
-const ClassList = {
-    "One": "one",
-    "Two": "two",
-    "Three": "three",
-    "Four": "four",
-    "Five": "five",
-    "Six": "six",
-    "Seven": "seven",
-    "Eight": "eight",
-    "Nine": "nine",
-    "Ten": "ten",
-    "Eleven": "eleven",
-    "Twelve": "twelve"
-}
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
+import { Checkbox } from "../ui/checkbox";
 
 interface UpdateStudentProps {
     accessToken: any;
     studentData: any
+    classes: any
     onUpdateTable(): void;
 }
-const UpdateStudent = ({ accessToken, studentData, onUpdateTable }: UpdateStudentProps) => {
+const UpdateStudent = ({ accessToken, studentData, classes, onUpdateTable }: UpdateStudentProps) => {
     const authToken = accessToken;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
     const pathname = usePathname();
     const lng = pathname.split('/')[1];
     const { t } = useTranslation(lng, 'Language');
+
+    let defaultClassValues: number[] = [];
+
+    try {
+        if (typeof studentData.class === "string") {
+            defaultClassValues = JSON.parse(studentData.class);
+        } else if (Array.isArray(studentData.class)) {
+            defaultClassValues = studentData.class;
+        }
+    } catch {
+        defaultClassValues = [];
+    }
+
+    const classMap = Object.fromEntries(
+        classes.map((cls: any) => [cls.id, cls.class_name])
+    );
     const UpdateSchema = z.object({
         fullName: z
             .string()
             .min(1, { message: t('fullname_is_required') })
             .max(100, { message: t('maximum_length_name') }),
 
-        class: z
-            .string()
-            .min(1, { message: t('class_is_required') })
-            .max(60, { message: t('maximum_length_class') }),
+        class: z.array(z.number()).min(1, { message: t("class_is_required") }),
 
         guardianPhone: z.string().refine((val) => isValidPhoneNumber(val), {
             message: t('invalid_phone_number'),
@@ -80,7 +81,7 @@ const UpdateStudent = ({ accessToken, studentData, onUpdateTable }: UpdateStuden
         resolver: zodResolver(UpdateSchema),
         defaultValues: {
             fullName: studentData.full_name || '',
-            class: studentData.class || '',
+            class: defaultClassValues,
             guardianPhone: studentData.guardian_phone || '',
             address: studentData.address || '',
             monthly_fee: studentData.monthly_fee || ""
@@ -89,7 +90,7 @@ const UpdateStudent = ({ accessToken, studentData, onUpdateTable }: UpdateStuden
 
 
     const onSubmit = async (values: z.infer<typeof UpdateSchema>) => {
-        console.log('🚀 ~ update-student.tsx:99 ~ values:', values);
+        // console.log('🚀 ~ update-student.tsx:99 ~ values:', values);
         setButtonDisable(true);
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/students/update`,
@@ -165,52 +166,87 @@ const UpdateStudent = ({ accessToken, studentData, onUpdateTable }: UpdateStuden
                                 )}
                             />
 
-                            {/* Class Field */}
+                            {/* ✅ CLASS SELECT */}
                             <FormField
                                 control={form.control}
                                 name="class"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('class')}</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl className="w-full">
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a Region" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {Object.entries(ClassList).map(([key, value]) => (
-                                                    <SelectItem key={key} value={value}>
-                                                        {key}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                render={({ field }) => {
+                                    const selectedValues = Array.isArray(field.value) ? field.value : [];
 
-                            {/* Contact Number Field */}
-                            <FormField
-                                control={form.control}
-                                name="guardianPhone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('guardian_phone')}</FormLabel>
-                                        <FormControl>
-                                            <PhoneInput
-                                                {...field}
-                                                placeholder={t('guardian_phone_hint')}
-                                                value={field.value}
-                                                onChange={(phone) => field.onChange(phone)}
-                                                defaultCountry="BD"
-                                                className="w-full p-2 text-sm border rounded-md"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                    return (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>{t("class")}</FormLabel>
+
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className="justify-between flex-wrap h-auto min-h-10"
+                                                        >
+                                                            {selectedValues.length > 0 ? (
+                                                                <div className="flex flex-wrap gap-1">
+                                                                    {selectedValues.map((id: number) => (
+                                                                        <span
+                                                                            key={id}
+                                                                            className="bg-muted px-2 py-1 rounded text-xs"
+                                                                        >
+                                                                            {classMap[id]}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                "Select classes"
+                                                            )}
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+
+                                                <PopoverContent className="w-full p-0">
+                                                    <Command>
+                                                        <CommandInput placeholder="Search classes..." />
+
+                                                        <CommandList className="max-h-60 overflow-y-auto">
+                                                            <CommandEmpty>No classes found</CommandEmpty>
+
+                                                            <CommandGroup>
+                                                                {classes.map((cls: any) => {
+                                                                    const isSelected = selectedValues.includes(cls.id);
+
+                                                                    return (
+                                                                        <CommandItem
+                                                                            key={cls.id}
+                                                                            onSelect={() => {
+                                                                                let updatedValues;
+
+                                                                                if (isSelected) {
+                                                                                    updatedValues = selectedValues.filter(
+                                                                                        (v: number) => v !== cls.id
+                                                                                    );
+                                                                                } else {
+                                                                                    updatedValues = [...selectedValues, cls.id];
+                                                                                }
+
+                                                                                field.onChange(updatedValues);
+                                                                            }}
+                                                                            className="flex items-center gap-2"
+                                                                        >
+                                                                            <Checkbox checked={isSelected} />
+                                                                            {cls.class_name}
+                                                                        </CommandItem>
+                                                                    );
+                                                                })}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
                             />
 
                             {/* Address Field */}

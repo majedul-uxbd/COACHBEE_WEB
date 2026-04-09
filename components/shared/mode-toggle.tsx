@@ -25,7 +25,7 @@ export function ModeToggle() {
     const themeLabel: Record<string, string> = {
         light: "Light Theme",
         dark: "Dark Theme",
-        system: "System Theme",
+        // system: "System Theme",
     }
 
     return (
@@ -55,9 +55,9 @@ export function ModeToggle() {
                     <DropdownMenuItem onClick={() => setTheme("dark")}>
                         Dark
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                    {/* <DropdownMenuItem onClick={() => setTheme("system")}>
                         System
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
