@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, SquarePlus } from "lucide-react";
 import { useState } from "react";
@@ -26,21 +25,6 @@ import { useTranslation } from "@/app/i18n/client";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 import { Checkbox } from "../ui/checkbox";
-
-const ClassList = {
-    "One": "one",
-    "Two": "two",
-    "Three": "three",
-    "Four": "four",
-    "Five": "five",
-    "Six": "six",
-    "Seven": "seven",
-    "Eight": "eight",
-    "Nine": "nine",
-    "Ten": "ten",
-    "Eleven": "eleven",
-    "Twelve": "twelve"
-}
 
 interface CreateStudentProps {
     session: any;
