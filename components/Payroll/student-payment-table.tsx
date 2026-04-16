@@ -32,34 +32,35 @@ import { ArrowUpDown, ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizo
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Students } from "@/interfaces/students.interface";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Checkbox } from "../ui/checkbox";
-import CreateStudent from "./create-student";
-import ChangeStatusDialog from "./change-status";
-import DeleteStudentDialog from "./delete-student";
-import UpdateStudent from "./update-student";
+import { StudentPayments } from "@/interfaces/student-payment.interface";
+// import CreateStudent from "./create-student";
+// import ChangeStatusDialog from "./change-status";
+// import DeleteStudentDialog from "./delete-student";
+// import UpdateStudent from "./update-student";
 
 
-interface StudentsTableProps {
+interface StudentPaymentsTableProps {
     session: any;
 }
 
-// const ClassList = {
-//     "One": "one",
-//     "Two": "two",
-//     "Three": "three",
-//     "Four": "four",
-//     "Five": "five",
-//     "Six": "six",
-//     "Seven": "seven",
-//     "Eight": "eight",
-//     "Nine": "nine",
-//     "Ten": "ten",
-//     "Eleven": "eleven",
-//     "Twelve": "twelve"
-// }
+const numberToWord: Record<number, string> = {
+    0: "Zero",
+    1: "One",
+    2: "Two",
+    3: "Three",
+    4: "Four",
+    5: "Five",
+    6: "Six",
+    7: "Seven",
+    8: "Eight",
+    9: "Nine",
+    10: "Ten",
+    11: "Eleven",
+    12: "Twelve",
+};
 
 const highlightText = (text: string, search: string) => {
     if (!search) return text;
@@ -80,10 +81,10 @@ const highlightText = (text: string, search: string) => {
     );
 };
 
-const StudentsTable = ({ session }: StudentsTableProps) => {
+const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     const accessToken = session?.user?.id;
     // console.log('🚀 ~ student-table.tsx:71 ~ accessToken:', accessToken);
-    const [data, setData] = useState<Students[]>([]);
+    const [data, setData] = useState<StudentPayments[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
@@ -97,6 +98,14 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     const pathname = usePathname();
     const lng = pathname.split("/")[1];
     const { t } = useTranslation(lng, "Language");
+    const [monthFilter, setMonthFilter] = useState<string>("");
+    const [yearFilter, setYearFilter] = useState<string>("");
+
+    const currentYear = new Date().getFullYear();
+
+    const yearOptions = Array.from({ length: 5 }, (_, i) =>
+        (currentYear - i).toString()
+    );
 
     // 🔹 Load saved visibility from localStorage (if exists)
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
@@ -109,7 +118,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         }
     );
 
-    const columns: ColumnDef<Students>[] = [
+    const columns: ColumnDef<StudentPayments>[] = [
         // {
         //     accessorKey: "id",
         //     header: ({ column }) => {
@@ -140,10 +149,10 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         // },
 
         {
-            accessorKey: "full_name",
+            accessorKey: "fullName",
             header: t("full_name"),
             cell: ({ row }) => {
-                const fullName = row.getValue("full_name") as string;
+                const fullName = row.getValue("fullName") as string;
                 return <div className="whitespace-nowrap text-start">{highlightText(fullName, globalFilter)}</div>;
             },
         },
@@ -152,68 +161,97 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             accessorKey: "class",
             header: t("class"),
             cell: ({ row }) => {
-                const className = row.getValue("class") as string;
-                const formattedClass = className.charAt(0).toUpperCase() + className.slice(1);
-                return <div className="whitespace-nowrap text-start">{highlightText(formattedClass, globalFilter)}</div>;
-            },
-        },
+                let classes = row.getValue("class");
 
-        {
-            accessorKey: "guardian_phone",
-            header: t("guardian_phone"),
-            cell: ({ row }) => (
-                <div className="whitespace-nowrap ">{highlightText(row.getValue("guardian_phone") as string, globalFilter)}</div>
-            ),
-        },
+                // 👉 Step 1: Convert string "[6]" → [6]
+                if (typeof classes === "string") {
+                    try {
+                        classes = JSON.parse(classes);
+                    } catch {
+                        classes = [];
+                    }
+                }
 
-        {
-            accessorKey: "monthly_fee",
-            header: t("monthly_fee"),
-            cell: ({ row }) => (
-                <div className="whitespace-nowrap ">{row.getValue("monthly_fee")}</div>
-            ),
-        },
+                // 👉 Step 2: Ensure it's an array
+                const classArray = Array.isArray(classes) ? classes : [classes];
 
-        {
-            accessorKey: "address",
-            header: t("address"),
-            cell: ({ row }) => (
-                <div className="whitespace-nowrap ">{row.getValue("address")}</div>
-            ),
-        },
+                // 👉 Step 3: Convert numbers → words
+                const formatted = classArray
+                    .map((num: number) => numberToWord[num] || num)
+                    .join(", ");
 
-        {
-            accessorKey: "is_active",
-            header: t("status"),
-            cell: ({ row }) => {
-                const isActive = row.getValue("is_active") === 1;
                 return (
-                    <Badge
-                        variant={isActive ? "default" : "destructive"}
-                        className="capitalize"
-                    >
-                        {isActive ? "Active" : "Inactive"}
-                    </Badge>
+                    <div className="whitespace-nowrap">
+                        {formatted}
+                    </div>
                 );
             },
         },
 
         {
-            accessorKey: "created_at",
-            header: "Created At",
+            accessorKey: "month",
+            header: t("month"),
             cell: ({ row }) => (
-                <div className="whitespace-nowrap">{row.original.created_at
-                    ? format(new Date(row.original.created_at), 'yyyy-MM-dd HH:mm:ss')
+                <div className="whitespace-nowrap ">{row.getValue("month")}</div>
+            ),
+        },
+
+        {
+            accessorKey: "year",
+            header: t("year"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("year")}</div>
+            ),
+        },
+
+        {
+            accessorKey: "totalPayableAmount",
+            header: t("total_payable_amount"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("totalPayableAmount")}</div>
+            ),
+        },
+
+        {
+            accessorKey: "paidAmount",
+            header: t("paid_amount"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("paidAmount")}</div>
+            ),
+        },
+
+        {
+            accessorKey: "duesAmount",
+            header: t("dues_amount"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("duesAmount")}</div>
+            ),
+        },
+
+        {
+            accessorKey: "paymentStatus",
+            header: t("payment_status"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("paymentStatus")}</div>
+            ),
+        },
+
+        {
+            accessorKey: "paymentDate",
+            header: t("payment_date"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap">{row.original.paymentDate
+                    ? format(new Date(row.original.paymentDate), 'yyyy-MM-dd HH:mm:ss')
                     : ''}</div>
             ),
         },
 
         {
-            accessorKey: "updated_at",
-            header: t("updated_at"),
+            accessorKey: "paymentUpdatedDate",
+            header: t("payment_updated_date"),
             cell: ({ row }) => (
-                <div className="whitespace-nowrap">{row.original.updated_at
-                    ? format(new Date(row.original.updated_at), 'yyyy-MM-dd HH:mm:ss')
+                <div className="whitespace-nowrap">{row.original.paymentUpdatedDate
+                    ? format(new Date(row.original.paymentUpdatedDate), 'yyyy-MM-dd HH:mm:ss')
                     : 'N/A'}</div>
             ),
         },
@@ -223,8 +261,6 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
             header: t("actions"),
             enableHiding: false,
             cell: ({ row }) => {
-                const isActive = row.original.is_active === 1;
-
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -239,51 +275,51 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
 
                             {/* Update Student Data */}
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <UpdateStudent
+                                {/* <UpdateStudent
                                     accessToken={accessToken}
-                                    studentData={row.original}
+                                    paymentData={row.original}
                                     onUpdateTable={() => {
-                                        studentsTableData({
+                                        studentPaymentTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
                                             sortOrder: "asc",
                                             filterBy: "",
                                         });
                                     }}
-                                />
+                                /> */}
                             </div>
 
                             {/* Change Student Status */}
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <ChangeStatusDialog
+                                {/* <ChangeStatusDialog
                                     id={row.original.id}
                                     accessToken={accessToken}
                                     statusCode={row.getValue("is_active") == 1 ? 0 : 1}
                                     onUpdateTable={() => {
-                                        studentsTableData({
+                                        studentPaymentTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
                                             sortOrder: "desc",
                                             filterBy: "",
                                         });
                                     }}
-                                />
+                                /> */}
                             </div>
 
                             {/* Delete Student Data */}
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <DeleteStudentDialog
+                                {/* <DeleteStudentDialog
                                     id={row.original.id}
                                     accessToken={accessToken}
                                     onUpdateTable={() => {
-                                        studentsTableData({
+                                        studentPaymentTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
                                             sortOrder: "desc",
                                             filterBy: "",
                                         });
                                     }}
-                                />
+                                /> */}
                             </div>
 
                             {/* <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
@@ -318,9 +354,9 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         }))
     }, [])
 
-    const studentsTableData = async (paginationData: any) => {
+    const studentPaymentTableData = async (paginationData: any, filters?: any) => {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/students/table-data`,
+            `${process.env.NEXT_PUBLIC_API_URL}/payroll/student-payments`,
             {
                 method: 'POST',
                 headers: {
@@ -328,7 +364,8 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                     'Authorization': `bearer ${accessToken}`
                 },
                 body: JSON.stringify({
-                    paginationData
+                    paginationData,
+                    filterData: filters
                 }),
             },
         );
@@ -336,19 +373,19 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         if (response.ok) {
             const responseData = await response.json();
             // console.log('🚀 ~ student-table.tsx:319 ~ responseData:', responseData);
-            const studentData = responseData?.data?.tableData as Students[];
+            const paymentData = responseData?.data?.tableData as StudentPayments[];
             const pageCount = Math.ceil(responseData?.data?.metadata?.totalRows / pagination.pageSize);
             if (pageCount === 0) {
                 setTotalPage(() => 1);
             } else {
                 setTotalPage(() => pageCount);
             }
-            if (studentData.length === 0) {
+            if (paymentData.length === 0) {
                 setData(() => []);
                 setIsLoading(false)
                 return;
             }
-            setData(() => studentData);
+            setData(() => paymentData);
             setIsLoading(false)
         }
         else {
@@ -365,12 +402,18 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     }, [columnVisibility]);
 
     useEffect(() => {
-        studentsTableData({
-            itemsPerPage: pagination.pageSize,
-            currentPageNumber: pagination.pageIndex,
-            sortOrder: "desc",
-            filterBy: ""
-        })
+        studentPaymentTableData(
+            {
+                itemsPerPage: pagination.pageSize,
+                currentPageNumber: pagination.pageIndex,
+                sortOrder: "desc",
+                filterBy: ""
+            },
+            {
+                month: monthFilter,
+                year: yearFilter
+            }
+        );
     }, [pagination]);
 
     const table = useReactTable({
@@ -404,49 +447,127 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                         onChange={(event) => setGlobalFilter(event.target.value)}
                     />
                 </div>
-                <div className="w-full flex justify-between md:justify-end  gap-2">
-                    {/* Column Toggle Popover */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" size="default" className="flex items-center gap-2">
-                                <Settings2 className="h-4 w-4" />
-                                Columns
+                <div className="w-full flex   gap-2">
+                    <div className="flex flex-col col-auto sm:flex-row gap-2 w-full">
+                        {/* Month Filter */}
+                        <div className="flex gap-2">
+                            <Select value={monthFilter} onValueChange={setMonthFilter}>
+                                <SelectTrigger className="w-full md:w-37.5">
+                                    <SelectValue placeholder="Select Month" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[
+                                        "January", "February", "March", "April", "May", "June",
+                                        "July", "August", "September", "October", "November", "December"
+                                    ].map((month) => (
+                                        <SelectItem key={month} value={month}>
+                                            {month}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Year Filter */}
+                            <Select value={yearFilter} onValueChange={setYearFilter}>
+                                <SelectTrigger className="w-full md:w-30">
+                                    <SelectValue placeholder="Select Year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {yearOptions.map((year) => (
+                                        <SelectItem key={year} value={year}>
+                                            {year}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex gap-2">
+                            {/* Filter Button */}
+                            <Button
+                                onClick={() => {
+                                    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+
+                                    studentPaymentTableData(
+                                        {
+                                            itemsPerPage: pagination.pageSize,
+                                            currentPageNumber: 0,
+                                            sortOrder: "desc",
+                                            filterBy: "",
+                                        },
+                                        {
+                                            month: monthFilter,
+                                            year: yearFilter,
+                                        }
+                                    );
+                                }}
+                            >
+                                Apply Filter
                             </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56 p-3">
-                            <p className="text-sm font-medium mb-2">Toggle Columns</p>
-                            <Separator className="mb-2" />
-                            <ScrollArea className="h-48 pr-2">
-                                <div className="flex flex-col gap-2">
-                                    {table
-                                        .getAllLeafColumns()
-                                        .filter((col) => col.getCanHide())
-                                        .map((column) => (
-                                            <div key={column.id} className="flex items-center gap-2">
-                                                <Checkbox
-                                                    checked={column.getIsVisible()}
-                                                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                                />
-                                                <label className="capitalize text-sm cursor-pointer">
-                                                    {column.id.replaceAll("_", " ")}
-                                                </label>
-                                            </div>
-                                        ))}
-                                </div>
-                            </ScrollArea>
-                        </PopoverContent>
-                    </Popover>
-                    <CreateStudent
+
+                            {/* Reset Button (optional but useful) */}
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setMonthFilter("");
+                                    setYearFilter("");
+
+                                    studentPaymentTableData({
+                                        itemsPerPage: pagination.pageSize,
+                                        currentPageNumber: 0,
+                                        sortOrder: "desc",
+                                        filterBy: "",
+                                    });
+                                }}
+                            >
+                                Reset
+                            </Button>
+                        </div>
+                    </div>
+                    {/* Column Toggle Popover */}
+                    <div>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" size="default" className="flex items-center gap-2">
+                                    <Settings2 className="h-4 w-4" />
+                                    Columns
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-56 p-3">
+                                <p className="text-sm font-medium mb-2">Toggle Columns</p>
+                                <Separator className="mb-2" />
+                                <ScrollArea className="h-48 pr-2">
+                                    <div className="flex flex-col gap-2">
+                                        {table
+                                            .getAllLeafColumns()
+                                            .filter((col) => col.getCanHide())
+                                            .map((column) => (
+                                                <div key={column.id} className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        checked={column.getIsVisible()}
+                                                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                                                    />
+                                                    <label className="capitalize text-sm cursor-pointer">
+                                                        {column.id.replaceAll("_", " ")}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </ScrollArea>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    {/* <CreateStudent
                         session={accessToken}
                         onCreateSuccess={() => {
-                            studentsTableData({
+                            studentPaymentTableData({
                                 itemsPerPage: pagination.pageSize,
                                 currentPageNumber: pagination.pageIndex,
                                 sortOrder: "desc",
                                 filterBy: "",
                             });
                         }}
-                    />
+                    /> */}
                 </div>
             </div>
 
@@ -578,4 +699,4 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
     )
 }
 
-export default StudentsTable;
+export default StudentPaymentsTable;

@@ -25,8 +25,8 @@ import {
 } from "../ui/tooltip";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import TeacherIcon from "../shared/set-teachers-icons";
+import { useTranslation } from "@/app/i18n/client";
 
 interface SidebarPageProps {
 	session: any;
@@ -36,6 +36,8 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 	const [collapsed, setCollapsed] = useState<boolean | null>(null);
 	const [isMobile, setIsMobile] = useState(false);
 	const pathname = usePathname(); // Get the current path
+	const lng = pathname.split("/")[1];
+	const { t } = useTranslation(lng, "Language");
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -121,8 +123,8 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 							},
 						}}>
 							<MenuItem
-								component={<Link href="/en/home" />}
-								className={cn(isActiveRoute("/en/home") && "bg-accent")}
+								component={<Link href={`/${lng}/home`} />}
+								className={cn(isActiveRoute(`/${lng}/home`) && "bg-accent")}
 								icon={
 									<TooltipProvider>
 										<Tooltip>
@@ -155,8 +157,8 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 							},
 						}}>
 							<MenuItem
-								component={<Link href="/en/teachers" />}
-								className={cn(isActiveRoute("/en/teachers") && "bg-accent")}
+								component={<Link href={`/${lng}/teachers`} />}
+								className={cn(isActiveRoute(`/${lng}/teachers`) && "bg-accent")}
 								icon={
 									<TooltipProvider>
 										<Tooltip>
@@ -190,8 +192,8 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 							},
 						}}>
 							<MenuItem
-								component={<Link href="/en/students" />}
-								className={cn(isActiveRoute("/en/students") && "bg-accent")}
+								component={<Link href={`/${lng}/students`} />}
+								className={cn(isActiveRoute(`/${lng}/students`) && "bg-accent")}
 								icon={
 									<TooltipProvider>
 										<Tooltip>
@@ -330,10 +332,10 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								<MenuItem className="dark:bg-black">
 									<Link
 										className={cn(
-											isActiveRoute("/en/salary") && "bg-accent p-2 cursor-pointer",
+											isActiveRoute(`/${lng}/salary`) && "bg-accent p-2 cursor-pointer",
 											"flex items-center text-[13px] gap-2"
 										)}
-										href="/en/salary"
+										href={`/${lng}/salary`}
 									>
 										<CircleDollarSign className="size-4" /> Salary
 									</Link>

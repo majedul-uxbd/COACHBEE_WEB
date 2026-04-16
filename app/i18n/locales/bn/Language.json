@@ -58,5 +58,11 @@
     "phone": "ফোন",
     "phone_hint": "ফোন নম্বর লিখুন",
     "maximum_length_class": "সর্বোচ্চ দৈর্ঘ্য 150 অক্ষর",
-    "no_class_found": "কোন ক্লাস পাওয়া যায়নি"
+    "no_class_found": "কোন ক্লাস পাওয়া যায়নি",
+    "total_payable_amount": "মোট পরিশোধ্য পরিমাণ",
+    "paid_amount": "পরিশোধিত পরিমাণ",
+    "dues_amount": "বকেয়া পরিমাণ",
+    "payment_status": "পেমেন্টের স্ট্যাটাস",
+    "payment_date": "পেমেন্টের তারিখ",
+    "payment_updated_date": "পেমেন্ট আপডেটেড তারিখ"
 }

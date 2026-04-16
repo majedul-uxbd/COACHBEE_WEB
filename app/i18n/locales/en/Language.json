@@ -58,5 +58,11 @@
     "salary_hint": "Enter Salary",
     "phone_hint": "Enter Phone Number",
     "maximum_length_class": "Maximum length is 150 characters",
-    "no_class_found": "No class found"
+    "no_class_found": "No class found",
+    "total_payable_amount": "Total Payable Amount",
+    "paid_amount": "Paid Amount",
+    "dues_amount": "Due Amount",
+    "payment_status": "Payment Status",
+    "payment_date": "Payment Date",
+    "payment_updated_date": "Payment Updated Date"
 }
