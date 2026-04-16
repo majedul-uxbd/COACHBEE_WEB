@@ -12,23 +12,19 @@ import { Button } from "@/components/ui/button";
 import { authenticate } from "@/app/api/actions";
 import { usePathname, useRouter } from "next/navigation";
 import { LoginSchema } from "@/schema/auth.schema";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { Module } from "@/interfaces/module.interface";
 import { useTranslation } from "@/app/i18n/client";
 
-interface LoginFormCardProps {
-  session: any;
-}
-export const LoginForm = ({ session }: LoginFormCardProps) => {
+// interface LoginFormCardProps {
+//   session: any;
+// }
+export const LoginForm = () => {
   const router = useRouter();
   const pathname = usePathname();
   const lng = pathname.split("/")[1];
   const { t } = useTranslation(lng, "Language");
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
-  const [module, setModule] = useState<Module[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
 
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -40,7 +36,6 @@ export const LoginForm = ({ session }: LoginFormCardProps) => {
   });
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    console.log("file: login-form.tsx:39 ~ onSubmit ~ values:", values);
     const formData = new FormData();
     formData.append("email", values.email);
     formData.append("password", values.password);

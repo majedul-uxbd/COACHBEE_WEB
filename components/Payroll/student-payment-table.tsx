@@ -99,9 +99,10 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     const lng = pathname.split("/")[1];
     const { t } = useTranslation(lng, "Language");
     const [monthFilter, setMonthFilter] = useState<string>("");
-    const [yearFilter, setYearFilter] = useState<string>("");
-
     const currentYear = new Date().getFullYear();
+
+    const [yearFilter, setYearFilter] = useState<string>(currentYear.toString());
+
 
     const yearOptions = Array.from({ length: 5 }, (_, i) =>
         (currentYear - i).toString()
@@ -119,34 +120,29 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     );
 
     const columns: ColumnDef<StudentPayments>[] = [
-        // {
-        //     accessorKey: "id",
-        //     header: ({ column }) => {
-        //         const isSorted = column.getIsSorted(); // 'asc' | 'desc' | false
-        //         return (
-        //             <div className="flex items-center justify-center gap-2">
-        //                 {t("student_id")}
-        //                 <Button
-        //                     variant="ghost"
-        //                     size="icon"
-        //                     className="h-4 w-4 p-0"
-        //                     onClick={() => column.toggleSorting(isSorted === "asc")}
-        //                 >
-        //                     <ArrowUpDown className="h-4 w-4" />
-        //                 </Button>
-        //             </div>
-        //         )
-        //     },
-        //     enableSorting: true,
-        //     sortingFn: (rowA, rowB, columnId) => {
-        //         return Number(rowA.getValue(columnId)) - Number(rowB.getValue(columnId));
-        //     },
-        //     cell: ({ row }) => (
-        //         <div className="whitespace-nowrap ">
-        //             {row.getValue("id")}
-        //         </div>
-        //     ),
-        // },
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    className="mr-3"
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                />
+            ),
+            enableSorting: true,
+            enableHiding: false,
+        },
 
         {
             accessorKey: "fullName",

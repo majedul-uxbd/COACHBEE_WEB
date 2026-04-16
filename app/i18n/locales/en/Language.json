@@ -10,6 +10,8 @@
     "guardian_phone": "Guardian Phone",
     "guardian_phone_hint": "Enter Guardian Phone Number",
     "class": "Class",
+    "month": "Month",
+    "year": "Year",
     "class_hint": "Select class",
     "address": "Address",
     "address_hint": "Enter Address",

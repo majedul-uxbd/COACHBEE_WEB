@@ -102,34 +102,30 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
     );
 
     const columns: ColumnDef<Teachers>[] = [
-        // {
-        //     accessorKey: "id",
-        //     header: ({ column }) => {
-        //         const isSorted = column.getIsSorted(); // 'asc' | 'desc' | false
-        //         return (
-        //             <div className="flex items-center justify-center gap-2">
-        //                 {t("student_id")}
-        //                 <Button
-        //                     variant="ghost"
-        //                     size="icon"
-        //                     className="h-4 w-4 p-0"
-        //                     onClick={() => column.toggleSorting(isSorted === "asc")}
-        //                 >
-        //                     <ArrowUpDown className="h-4 w-4" />
-        //                 </Button>
-        //             </div>
-        //         )
-        //     },
-        //     enableSorting: true,
-        //     sortingFn: (rowA, rowB, columnId) => {
-        //         return Number(rowA.getValue(columnId)) - Number(rowB.getValue(columnId));
-        //     },
-        //     cell: ({ row }) => (
-        //         <div className="whitespace-nowrap ">
-        //             {row.getValue("id")}
-        //         </div>
-        //     ),
-        // },
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    className="mr-3"
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                />
+            ),
+            enableSorting: true,
+            enableHiding: false,
+        },
+
 
         {
             accessorKey: "full_name",
@@ -237,7 +233,7 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
             header: t("actions"),
             enableHiding: false,
             cell: ({ row }) => {
-                const isActive = row.original.is_active === 1;
+                // const isActive = row.original.is_active === 1;
 
                 return (
                     <DropdownMenu>
@@ -261,7 +257,7 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
                                         teachersTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
-                                            sortOrder: "asc",
+                                            sortOrder: "desc",
                                             filterBy: "",
                                         });
                                     }}

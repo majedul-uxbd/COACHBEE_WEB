@@ -332,12 +332,12 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								<MenuItem className="dark:bg-black">
 									<Link
 										className={cn(
-											isActiveRoute(`/${lng}/salary`) && "bg-accent p-2 cursor-pointer",
+											isActiveRoute(`/${lng}/student-payment`) && "bg-accent p-2 cursor-pointer",
 											"flex items-center text-[13px] gap-2"
 										)}
-										href={`/${lng}/salary`}
+										href={`/${lng}/student-payment`}
 									>
-										<CircleDollarSign className="size-4" /> Salary
+										<CircleDollarSign className="size-4" /> Student Payment
 									</Link>
 								</MenuItem>
 							</SubMenu>
