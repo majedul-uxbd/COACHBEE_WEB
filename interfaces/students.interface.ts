@@ -9,3 +9,10 @@ export interface Students {
     created_at: Date;
     updated_at: Date | null;
 }
+
+
+export interface StudentList {
+    id: number;
+    full_name: string;
+    totalPayableAmount: number;
+}

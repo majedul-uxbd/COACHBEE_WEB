@@ -49,6 +49,8 @@
     "updating": "আপডেট হচ্ছে",
     "update_student_dialog_title": "শিক্ষার্থী তথ্য আপডেট করুন",
     "update_student_dialog_description": "শিক্ষার্থী আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।",
+    "update_teacher_dialog_title": "শিক্ষকের তথ্য আপডেট করুন",
+    "update_teacher_dialog_description": "শিক্ষক আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।",
     "teacher_status_dialog_title": "শিক্ষকের অবস্থা পরিবর্তন করুন",
     "teacher_status_dialog_description": "আপনি কি নিশ্চিত যে আপনি এই শিক্ষকের অবস্থা পরিবর্তন করতে চান?",
     "delete_teacher_dialog_title": "শিক্ষককে মুছে ফেলুন",
@@ -65,6 +67,14 @@
     "paid_amount": "পরিশোধিত পরিমাণ",
     "dues_amount": "বকেয়া পরিমাণ",
     "payment_status": "পেমেন্টের স্ট্যাটাস",
-    "payment_date": "পেমেন্টের তারিখ",
-    "payment_updated_date": "পেমেন্ট আপডেটেড তারিখ"
+    "payment_generated_date": "পেমেন্ট তৈরির তারিখ",
+    "payment_date": "পেমেন্ট তারিখ",
+    "create_student_payment": "শিক্ষার্থী পেমেন্ট তৈরি করুন",
+    "create_student_payment_dialog_description": "নতুন শিক্ষার্থী পেমেন্ট তৈরি করতে নিচের বিবরণগুলি পূরণ করুন।",
+    "student_name": "শিক্ষার্থীর নাম",
+    "select_student": "শিক্ষার্থী নির্বাচন করুন",
+    "select_month": "মাস নির্বাচন করুন",
+    "update_student_payment": "শিক্ষার্থী পেমেন্ট আপডেট করুন",
+    "update_student_payment_dialog_description": "শিক্ষার্থী পেমেন্ট আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।",
+    "please_enter_paid_amount": "অনুগ্রহ করে পরিশোধিত পরিমাণ লিখুন"
 }

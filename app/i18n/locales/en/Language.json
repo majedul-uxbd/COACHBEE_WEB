@@ -50,6 +50,8 @@
     "phone": "Phone",
     "update_student_dialog_title": "Update Student",
     "update_student_dialog_description": "Fill in the details below to update the student.",
+    "update_teacher_dialog_title": "Update Teacher",
+    "update_teacher_dialog_description": "Fill in the details below to update the teacher.",
     "teacher_status_dialog_title": "Change Teacher Status",
     "teacher_status_dialog_description": "Are you sure you want to change the status of this teacher?",
     "delete_teacher_dialog_title": "Delete Teacher",
@@ -65,6 +67,14 @@
     "paid_amount": "Paid Amount",
     "dues_amount": "Due Amount",
     "payment_status": "Payment Status",
+    "payment_generated_date": "Payment Generated Date",
     "payment_date": "Payment Date",
-    "payment_updated_date": "Payment Updated Date"
+    "create_student_payment": "Create Student Payment",
+    "create_student_payment_dialog_description": "Fill in the details below to create a new student payment.",
+    "student_name": "Student Name",
+    "select_student": "Select Student",
+    "select_month": "Select Month",
+    "update_student_payment": "Update Student Payment",
+    "update_student_payment_dialog_description": "Fill in the details below to update the student payment.",
+    "please_enter_paid_amount": "Please enter paid amount"
 }

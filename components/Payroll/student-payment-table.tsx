@@ -24,11 +24,9 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-// import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizontalIcon, Settings2 } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizontalIcon, Settings2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,6 +34,10 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Checkbox } from "../ui/checkbox";
 import { StudentPayments } from "@/interfaces/student-payment.interface";
+import CreateStudentPayment from "./create-student-payment";
+import { StudentList } from "@/interfaces/students.interface";
+import UpdateStudentPayment from "./update-student-payment";
+import { Badge } from "../ui/badge";
 // import CreateStudent from "./create-student";
 // import ChangeStatusDialog from "./change-status";
 // import DeleteStudentDialog from "./delete-student";
@@ -83,8 +85,8 @@ const highlightText = (text: string, search: string) => {
 
 const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     const accessToken = session?.user?.id;
-    // console.log('🚀 ~ student-table.tsx:71 ~ accessToken:', accessToken);
     const [data, setData] = useState<StudentPayments[]>([]);
+    const [studentList, setStudentList] = useState<StudentList[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
@@ -227,28 +229,38 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         {
             accessorKey: "paymentStatus",
             header: t("payment_status"),
+            cell: ({ row }) => {
+                const status = row.getValue("paymentStatus") as string
+
+                return (
+                    <div className="whitespace-nowrap">
+                        <Badge
+                            variant={status === "PAID" ? "default" : "destructive"}
+                        >
+                            {status}
+                        </Badge>
+                    </div>
+                )
+            },
+        },
+
+        {
+            accessorKey: "paymentUpdatedDate",
+            header: t("payment_date"),
             cell: ({ row }) => (
-                <div className="whitespace-nowrap ">{row.getValue("paymentStatus")}</div>
+                <div className="whitespace-nowrap">{row.original.paymentUpdatedDate
+                    ? format(new Date(row.original.paymentUpdatedDate), 'yyyy-MM-dd HH:mm:ss')
+                    : 'N/A'}</div>
             ),
         },
 
         {
             accessorKey: "paymentDate",
-            header: t("payment_date"),
+            header: t("payment_generated_date"),
             cell: ({ row }) => (
                 <div className="whitespace-nowrap">{row.original.paymentDate
                     ? format(new Date(row.original.paymentDate), 'yyyy-MM-dd HH:mm:ss')
                     : ''}</div>
-            ),
-        },
-
-        {
-            accessorKey: "paymentUpdatedDate",
-            header: t("payment_updated_date"),
-            cell: ({ row }) => (
-                <div className="whitespace-nowrap">{row.original.paymentUpdatedDate
-                    ? format(new Date(row.original.paymentUpdatedDate), 'yyyy-MM-dd HH:mm:ss')
-                    : 'N/A'}</div>
             ),
         },
 
@@ -271,7 +283,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
 
                             {/* Update Student Data */}
                             <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                {/* <UpdateStudent
+                                <UpdateStudentPayment
                                     accessToken={accessToken}
                                     paymentData={row.original}
                                     onUpdateTable={() => {
@@ -282,7 +294,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                             filterBy: "",
                                         });
                                     }}
-                                /> */}
+                                />
                             </div>
 
                             {/* Change Student Status */}
@@ -387,8 +399,30 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         else {
             console.error("fetch req failed: ", response)
         }
+    };
 
-    }
+    const getStudentList = async () => {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/students/student-list`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    lg: lng,
+                }),
+            },
+        );
+
+        if (response.ok) {
+            const responseData = await response.json();
+            const studentList = responseData?.data as StudentList[];
+            // console.log('🚀 ~ student-payment-table.tsx:410 ~ studentList:', studentList);
+            setStudentList(() => studentList);
+        }
+    };
 
     useEffect(() => {
         localStorage.setItem(
@@ -410,6 +444,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                 year: yearFilter
             }
         );
+        getStudentList();
     }, [pagination]);
 
     const table = useReactTable({
@@ -543,7 +578,9 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                                         onCheckedChange={(value) => column.toggleVisibility(!!value)}
                                                     />
                                                     <label className="capitalize text-sm cursor-pointer">
-                                                        {column.id.replaceAll("_", " ")}
+                                                        {typeof column.columnDef.header === "string"
+                                                            ? column.columnDef.header
+                                                            : column.id}
                                                     </label>
                                                 </div>
                                             ))}
@@ -553,8 +590,9 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                         </Popover>
                     </div>
 
-                    {/* <CreateStudent
+                    {/* <CreateStudentPayment
                         session={accessToken}
+                        studentList={studentList}
                         onCreateSuccess={() => {
                             studentPaymentTableData({
                                 itemsPerPage: pagination.pageSize,
