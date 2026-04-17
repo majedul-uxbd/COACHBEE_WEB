@@ -1,7 +1,9 @@
 {
     "create": "Create",
     "creating": "Creating",
+    "submit": "Submit",
     "cancel": "Cancel",
+    "reset": "Reset",
     "email": "Email",
     "password": "Password",
     "student_id": "Student ID",
@@ -76,5 +78,18 @@
     "select_month": "Select Month",
     "update_student_payment": "Update Student Payment",
     "update_student_payment_dialog_description": "Fill in the details below to update the student payment.",
-    "please_enter_paid_amount": "Please enter paid amount"
+    "please_enter_paid_amount": "Please enter paid amount",
+    "profile": "Profile",
+    "columns": "Columns",
+    "toggle_columns": "Toggle Columns",
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "students": "Students",
+        "teachers": "Teachers",
+        "student_payments": "Student Payments",
+        "payroll": "Payroll"
+    },
+    "search_hint": {
+        "search_by_full_name": "Search by Full name..."
+    }
 }

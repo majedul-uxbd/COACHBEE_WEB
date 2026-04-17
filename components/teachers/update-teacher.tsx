@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
-import 'react-phone-number-input/style.css';
+// import 'react-phone-number-input/style.css';
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -133,7 +133,7 @@ const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: Upd
             <DialogTrigger asChild>
                 <Button variant="ghost" className="w-full flex justify-start text-left text-xs text-accent-foreground">
                     <div className="flex items-center -ml-1.5 gap-2">
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4 w-4 text-green-600" />
                         <span>{t("update")}</span>
                     </div>
                 </Button>

@@ -140,7 +140,7 @@ const UpdateStudentPayment = ({ accessToken, paymentData, onUpdateTable }: Creat
                     className="w-full flex justify-start text-left text-xs text-accent-foreground"
                 >
                     <div className="flex items-center -ml-1.5 gap-2">
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4 w-4 text-green-600" />
                         <span>{t("update_student_payment")}</span>
                     </div>
                 </Button>

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const LoginPage = async () => {
   const session = await auth();
   if (session) {
-    redirect('/coachbee/en/home');
+    redirect('/en/home');
   }
   return (
     <LoginForm />

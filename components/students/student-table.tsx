@@ -159,7 +159,9 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
 
                 return (
                     <div className="whitespace-nowrap">
-                        {formattedClass || "N/A"}
+                        {formattedClass
+                            ? highlightText(formattedClass, globalFilter)
+                            : "N/A"}
                     </div>
                 );
             },
@@ -431,7 +433,7 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                 <div className="w-full">
                     <Input
                         className="w-full"
-                        placeholder="Search by Full name or Username or Email..."
+                        placeholder={t("search_hint.search_by_full_name")}
                         value={globalFilter}
                         onChange={(event) => setGlobalFilter(event.target.value)}
                     />
@@ -442,11 +444,11 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
                         <PopoverTrigger asChild>
                             <Button variant="outline" size="default" className="flex items-center gap-2">
                                 <Settings2 className="h-4 w-4" />
-                                Columns
+                                {t("columns")}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-56 p-3">
-                            <p className="text-sm font-medium mb-2">Toggle Columns</p>
+                            <p className="text-sm font-medium mb-2">{t("toggle_columns")}</p>
                             <Separator className="mb-2" />
                             <ScrollArea className="h-48 pr-2">
                                 <div className="flex flex-col gap-2">

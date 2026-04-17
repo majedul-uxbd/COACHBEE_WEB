@@ -136,14 +136,14 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 												align="center"
 												className="border p-2"
 											>
-												Dashboard
+												{t("sidebar.dashboard")}
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
 								}
 							>
 								<p className="text-[14px]">
-									Dashboard
+									{t("sidebar.dashboard")}
 								</p>
 							</MenuItem>
 						</Menu>
@@ -171,14 +171,14 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 												align="center"
 												className="border p-2"
 											>
-												Teachers
+												{t("sidebar.teachers")}
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
 								}
 							>
 								<p className="text-[14px]">
-									Teachers
+									{t("sidebar.teachers")}
 								</p>
 							</MenuItem>
 						</Menu>
@@ -205,14 +205,14 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 												align="center"
 												className="border p-2"
 											>
-												Students
+												{t("sidebar.students")}
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
 								}
 							>
 								<p className="text-[14px]">
-									Students
+									{t("sidebar.students")}
 								</p>
 							</MenuItem>
 						</Menu>
@@ -322,12 +322,12 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 												align="center"
 												className="border p-2"
 											>
-												Payroll
+												{t("sidebar.payroll")}
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
 								}
-								label="Payroll"
+								label={t("sidebar.payroll")}
 							>
 								<MenuItem className="dark:bg-black">
 									<Link
@@ -337,7 +337,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 										)}
 										href={`/${lng}/student-payment`}
 									>
-										<CircleDollarSign className="size-4" /> Student Payment
+										<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
 									</Link>
 								</MenuItem>
 							</SubMenu>

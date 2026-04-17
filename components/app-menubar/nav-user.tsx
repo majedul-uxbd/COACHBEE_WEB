@@ -25,12 +25,16 @@ import { Badge } from "../ui/badge";
 import { ModeToggle } from "../shared/mode-toggle";
 import SignOutDialog from "../shared/SignoutDialog";
 import { se } from "date-fns/locale";
+import { usePathname } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 
 export function NavUser({ session }: any) {
     // const imageUrl = useProfileStore((state: any) => state.imageUrl);
     // const fullName = useProfileNameStore((state: any) => state.ProfileName);
     const [popOverStage, setPopOverStage] = React.useState<boolean>(false);
-
+    const pathname = usePathname(); // Get the current path
+    const lng = pathname.split("/")[1];
+    const { t } = useTranslation(lng, "Language");
     // console.log('🚀 ~ nav-user.tsx:33 ~ session:', session);
     if (!session) return null; // Fallback if session is not available
 
@@ -87,7 +91,7 @@ export function NavUser({ session }: any) {
                             onClick={() => setPopOverStage(false)}
                         >
                             <User2 className="h-5 w-5 mr-3" />
-                            Profile
+                            {t("profile")}
                         </div>
                     </Link>
                     <div className="pt-2 pb-2 pl-2 hover:bg-accent flex z-30  justify-between text-sm cursor-pointer rounded transition-colors duration-200">

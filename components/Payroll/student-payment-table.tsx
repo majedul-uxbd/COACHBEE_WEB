@@ -29,7 +29,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizontalIcon, Settings2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Checkbox } from "../ui/checkbox";
@@ -38,6 +37,9 @@ import CreateStudentPayment from "./create-student-payment";
 import { StudentList } from "@/interfaces/students.interface";
 import UpdateStudentPayment from "./update-student-payment";
 import { Badge } from "../ui/badge";
+import { useMemo } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+
 // import CreateStudent from "./create-student";
 // import ChangeStatusDialog from "./change-status";
 // import DeleteStudentDialog from "./delete-student";
@@ -83,10 +85,29 @@ const highlightText = (text: string, search: string) => {
     );
 };
 
+
+const classOptions = [
+    { label: "All Classes", value: "all" },
+    { label: "One", value: "1" },
+    { label: "Two", value: "2" },
+    { label: "Three", value: "3" },
+    { label: "Four", value: "4" },
+    { label: "Five", value: "5" },
+    { label: "Six", value: "6" },
+    { label: "Seven", value: "7" },
+    { label: "Eight", value: "8" },
+    { label: "Nine", value: "9" },
+    { label: "Ten", value: "10" },
+    { label: "Eleven", value: "11" },
+    { label: "Twelve", value: "12" },
+];
+
+
 const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     const accessToken = session?.user?.id;
     const [data, setData] = useState<StudentPayments[]>([]);
-    const [studentList, setStudentList] = useState<StudentList[]>([]);
+    // const [studentList, setStudentList] = useState<StudentList[]>([]);
+    const [classFilter, setClassFilter] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
@@ -121,7 +142,37 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         }
     );
 
+
+    const filteredData = useMemo(() => {
+        return data.filter((row) => {
+            if (!classFilter || classFilter === "all") return true;
+
+            const raw = row.class;
+
+            let classes: number[] = [];
+
+            if (Array.isArray(raw)) {
+                classes = raw.map(Number);
+            }
+            else if (typeof raw === "string") {
+                try {
+                    const parsed = JSON.parse(raw);
+                    classes = Array.isArray(parsed)
+                        ? parsed.map(Number)
+                        : [];
+                } catch {
+                    classes = raw.split(",").map(Number);
+                }
+            }
+
+            const filterValue = Number(classFilter);
+
+            return classes.includes(filterValue);
+        });
+    }, [data, classFilter]);
+
     const columns: ColumnDef<StudentPayments>[] = [
+
         {
             id: "select",
             header: ({ table }) => (
@@ -159,14 +210,15 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
             accessorKey: "class",
             header: t("class"),
             cell: ({ row }) => {
-                let classes = row.getValue("class");
+                let classes: string | number[] = row.getValue("class");
+                console.log(classes)
 
                 // 👉 Step 1: Convert string "[6]" → [6]
                 if (typeof classes === "string") {
                     try {
                         classes = JSON.parse(classes);
                     } catch {
-                        classes = [];
+                        classes = [] as number[];
                     }
                 }
 
@@ -175,12 +227,15 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
 
                 // 👉 Step 3: Convert numbers → words
                 const formatted = classArray
-                    .map((num: number) => numberToWord[num] || num)
+                    .filter((num): num is number => typeof num === "number")
+                    .map((num) => numberToWord[num] || num)
                     .join(", ");
 
                 return (
                     <div className="whitespace-nowrap">
-                        {formatted}
+                        {formatted
+                            ? highlightText(formatted, globalFilter)
+                            : "N/A"}
                     </div>
                 );
             },
@@ -296,63 +351,13 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                     }}
                                 />
                             </div>
-
-                            {/* Change Student Status */}
-                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                {/* <ChangeStatusDialog
-                                    id={row.original.id}
-                                    accessToken={accessToken}
-                                    statusCode={row.getValue("is_active") == 1 ? 0 : 1}
-                                    onUpdateTable={() => {
-                                        studentPaymentTableData({
-                                            itemsPerPage: pagination.pageSize,
-                                            currentPageNumber: pagination.pageIndex,
-                                            sortOrder: "desc",
-                                            filterBy: "",
-                                        });
-                                    }}
-                                /> */}
-                            </div>
-
-                            {/* Delete Student Data */}
-                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                {/* <DeleteStudentDialog
-                                    id={row.original.id}
-                                    accessToken={accessToken}
-                                    onUpdateTable={() => {
-                                        studentPaymentTableData({
-                                            itemsPerPage: pagination.pageSize,
-                                            currentPageNumber: pagination.pageIndex,
-                                            sortOrder: "desc",
-                                            filterBy: "",
-                                        });
-                                    }}
-                                /> */}
-                            </div>
-
-                            {/* <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <UpdateZoneDialog
-                                    rowData={row.original}
-                                    depotData={depotData}
-                                    accessToken={accessToken}
-                                    onUpdateSuccess={() => {
-                                        getCountInformation();
-                                        zoneTableData({
-                                            itemsPerPage: pagination.pageSize,
-                                            currentPageNumber: pagination.pageIndex,
-                                            sortOrder: "asc",
-                                            filterBy: "",
-                                        });
-                                    }}
-                                />
-                            </div> */}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
             },
         }
     ]
-
+    const hasData = filteredData.length > 0;
     const handlePaginationState = useCallback(async (btnType: "prev" | "next" | "last" | "first" = "next") => {
         const factor = btnType === "next" ? 1 : -1;
 
@@ -401,28 +406,28 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         }
     };
 
-    const getStudentList = async () => {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/students/student-list`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `bearer ${accessToken}`
-                },
-                body: JSON.stringify({
-                    lg: lng,
-                }),
-            },
-        );
+    // const getStudentList = async () => {
+    //     const response = await fetch(
+    //         `${process.env.NEXT_PUBLIC_API_URL}/students/student-list`,
+    //         {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': `bearer ${accessToken}`
+    //             },
+    //             body: JSON.stringify({
+    //                 lg: lng,
+    //             }),
+    //         },
+    //     );
 
-        if (response.ok) {
-            const responseData = await response.json();
-            const studentList = responseData?.data as StudentList[];
-            // console.log('🚀 ~ student-payment-table.tsx:410 ~ studentList:', studentList);
-            setStudentList(() => studentList);
-        }
-    };
+    //     if (response.ok) {
+    //         const responseData = await response.json();
+    //         const studentList = responseData?.data as StudentList[];
+    //         // console.log('🚀 ~ student-payment-table.tsx:410 ~ studentList:', studentList);
+    //         setStudentList(() => studentList);
+    //     }
+    // };
 
     useEffect(() => {
         localStorage.setItem(
@@ -444,11 +449,11 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                 year: yearFilter
             }
         );
-        getStudentList();
+        // getStudentList();
     }, [pagination]);
 
     const table = useReactTable({
-        data,
+        data: filteredData,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -470,21 +475,36 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     return (
         <div className="w-full">
             <div className="flex justify-start flex-col gap-2 md:flex-row md:justify-between items-start md:items-center mb-2">
-                <div className="w-full">
+                <div className="w-full flex flex-col sm:flex-row gap-2">
                     <Input
                         className="w-full"
-                        placeholder="Search by Full name or Username or Email..."
+                        placeholder={t("search_hint.search_by_full_name")}
                         value={globalFilter}
                         onChange={(event) => setGlobalFilter(event.target.value)}
                     />
+
+                    {/* </div>
+                <div> */}
+                    <Select value={classFilter} onValueChange={setClassFilter}>
+                        <SelectTrigger className="w-30">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {classOptions.map((item) => (
+                                <SelectItem key={item.value} value={item.value}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="w-full flex   gap-2">
                     <div className="flex flex-col col-auto sm:flex-row gap-2 w-full">
                         {/* Month Filter */}
                         <div className="flex gap-2">
                             <Select value={monthFilter} onValueChange={setMonthFilter}>
-                                <SelectTrigger className="w-full md:w-37.5">
-                                    <SelectValue placeholder="Select Month" />
+                                <SelectTrigger className="w-full md:w-30">
+                                    <SelectValue placeholder={t("month")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {[
@@ -500,7 +520,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
 
                             {/* Year Filter */}
                             <Select value={yearFilter} onValueChange={setYearFilter}>
-                                <SelectTrigger className="w-full md:w-30">
+                                <SelectTrigger className="w-full md:w-20">
                                     <SelectValue placeholder="Select Year" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -532,7 +552,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                     );
                                 }}
                             >
-                                Apply Filter
+                                {t("submit")}
                             </Button>
 
                             {/* Reset Button (optional but useful) */}
@@ -550,7 +570,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                     });
                                 }}
                             >
-                                Reset
+                                {t("reset")}
                             </Button>
                         </div>
                     </div>
@@ -560,11 +580,11 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                             <PopoverTrigger asChild>
                                 <Button variant="outline" size="default" className="flex items-center gap-2">
                                     <Settings2 className="h-4 w-4" />
-                                    Columns
+                                    {t("columns")}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-56 p-3">
-                                <p className="text-sm font-medium mb-2">Toggle Columns</p>
+                                <p className="text-sm font-medium mb-2">{t("toggle_columns")}</p>
                                 <Separator className="mb-2" />
                                 <ScrollArea className="h-48 pr-2">
                                     <div className="flex flex-col gap-2">
@@ -636,29 +656,34 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        ) : table.getRowModel().rows.length === 0 && table.getState().globalFilter ? (
-                            // If no rows match the filter, show the "No data matched" message inside a table row
+                        ) : table.getRowModel().rows.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No data matched
+                                    {globalFilter || classFilter
+                                        ? "No data matched"
+                                        : "No results"}
                                 </TableCell>
                             </TableRow>
-                        ) : data.length > 0 ? (
+                        ) : (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow className="text-center" key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                                <TableRow
+                                    key={row.id}
+                                    className="text-center"
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="p-3 border-r rounded ">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        <TableCell
+                                            key={cell.id}
+                                            className="p-3 border-r rounded"
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
-                        ) : (
-                            <TableRow className="">
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
-                                </TableCell>
-                            </TableRow>
                         )}
                     </TableBody>
                 </Table>
