@@ -65,12 +65,17 @@
     "phone_hint": "ফোন নম্বর লিখুন",
     "maximum_length_class": "সর্বোচ্চ দৈর্ঘ্য 150 অক্ষর",
     "no_class_found": "কোন ক্লাস পাওয়া যায়নি",
+    "bonus": "বোনাস",
+    "note": "নোট",
+    "salary_status": "বেতন স্ট্যাটাস",
     "total_payable_amount": "মোট পরিশোধ্য পরিমাণ",
     "paid_amount": "পরিশোধিত পরিমাণ",
     "dues_amount": "বকেয়া পরিমাণ",
     "payment_status": "পেমেন্টের স্ট্যাটাস",
     "payment_generated_date": "পেমেন্ট তৈরির তারিখ",
     "payment_date": "পেমেন্ট তারিখ",
+    "salary_date": "বেতন তারিখ",
+    "salary_generated_date": "বেতন তৈরির তারিখ",
     "create_student_payment": "শিক্ষার্থী পেমেন্ট তৈরি করুন",
     "create_student_payment_dialog_description": "নতুন শিক্ষার্থী পেমেন্ট তৈরি করতে নিচের বিবরণগুলি পূরণ করুন।",
     "student_name": "শিক্ষার্থীর নাম",
@@ -86,8 +91,9 @@
         "dashboard": "ড্যাশবোর্ড",
         "students": "শিক্ষার্থীবৃন্দ",
         "teachers": "শিক্ষকবৃন্দ",
+        "payroll": "বেতন তালিকা",
         "student_payments": "শিক্ষার্থীদের বেতন",
-        "payroll": "বেতন তালিকা"
+        "teachers_salary": "শিক্ষকদের বেতন"
     },
     "search_hint": {
         "search_by_full_name": "পূর্ণ নাম দিয়ে অনুসন্ধান করুন..."

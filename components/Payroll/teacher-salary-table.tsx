@@ -39,6 +39,7 @@ import UpdateStudentPayment from "./update-student-payment";
 import { Badge } from "../ui/badge";
 import { useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { TeacherSalary } from "@/interfaces/teacher-salary.interface";
 
 // import CreateStudent from "./create-student";
 // import ChangeStatusDialog from "./change-status";
@@ -46,7 +47,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 // import UpdateStudent from "./update-student";
 
 
-interface StudentPaymentsTableProps {
+interface TeachersSalaryTableProps {
     session: any;
 }
 
@@ -103,9 +104,9 @@ const classOptions = [
 ];
 
 
-const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
+const TeachersSalaryTable = ({ session }: TeachersSalaryTableProps) => {
     const accessToken = session?.user?.id;
-    const [data, setData] = useState<StudentPayments[]>([]);
+    const [data, setData] = useState<TeacherSalary[]>([]);
     // const [studentList, setStudentList] = useState<StudentList[]>([]);
     const [classFilter, setClassFilter] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
@@ -171,7 +172,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         });
     }, [data, classFilter]);
 
-    const columns: ColumnDef<StudentPayments>[] = [
+    const columns: ColumnDef<TeacherSalary>[] = [
 
         {
             id: "select",
@@ -258,6 +259,14 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         },
 
         {
+            accessorKey: "bonus",
+            header: t("bonus"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("bonus")}</div>
+            ),
+        },
+
+        {
             accessorKey: "totalPayableAmount",
             header: t("total_payable_amount"),
             cell: ({ row }) => (
@@ -282,10 +291,18 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         },
 
         {
-            accessorKey: "paymentStatus",
-            header: t("payment_status"),
+            accessorKey: "note",
+            header: t("note"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("note")}</div>
+            ),
+        },
+
+        {
+            accessorKey: "salaryStatus",
+            header: t("salary_status"),
             cell: ({ row }) => {
-                const status = row.getValue("paymentStatus") as string
+                const status = row.getValue("salaryStatus") as string
 
                 return (
                     <div className="whitespace-nowrap">
@@ -300,21 +317,21 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         },
 
         {
-            accessorKey: "paymentUpdatedDate",
-            header: t("payment_date"),
+            accessorKey: "salaryUpdatedDate",
+            header: t("salary_date"),
             cell: ({ row }) => (
-                <div className="whitespace-nowrap">{row.original.paymentUpdatedDate
-                    ? format(new Date(row.original.paymentUpdatedDate), 'yyyy-MM-dd HH:mm:ss')
+                <div className="whitespace-nowrap">{row.original.salaryUpdatedDate
+                    ? format(new Date(row.original.salaryUpdatedDate), 'yyyy-MM-dd HH:mm:ss')
                     : 'N/A'}</div>
             ),
         },
 
         {
-            accessorKey: "paymentDate",
-            header: t("payment_generated_date"),
+            accessorKey: "salaryDate",
+            header: t("salary_generated_date"),
             cell: ({ row }) => (
-                <div className="whitespace-nowrap">{row.original.paymentDate
-                    ? format(new Date(row.original.paymentDate), 'yyyy-MM-dd HH:mm:ss')
+                <div className="whitespace-nowrap">{row.original.salaryDate
+                    ? format(new Date(row.original.salaryDate), 'yyyy-MM-dd HH:mm:ss')
                     : ''}</div>
             ),
         },
@@ -337,12 +354,12 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                             <DropdownMenuSeparator />
 
                             {/* Update Student Data */}
-                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
+                            {/* <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
                                 <UpdateStudentPayment
                                     accessToken={accessToken}
-                                    paymentData={row.original}
+                                    salaryData={row.original}
                                     onUpdateTable={() => {
-                                        studentPaymentTableData({
+                                        teachersSalaryTableData({
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: pagination.pageIndex,
                                             sortOrder: "asc",
@@ -350,7 +367,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                         });
                                     }}
                                 />
-                            </div>
+                            </div> */}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
@@ -367,9 +384,9 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         }))
     }, [])
 
-    const studentPaymentTableData = async (paginationData: any, filters?: any) => {
+    const teachersSalaryTableData = async (paginationData: any, filters?: any) => {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/payroll/student-payments`,
+            `${process.env.NEXT_PUBLIC_API_URL}/payroll/teacher-salary`,
             {
                 method: 'POST',
                 headers: {
@@ -386,19 +403,19 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         if (response.ok) {
             const responseData = await response.json();
             // console.log('🚀 ~ student-table.tsx:319 ~ responseData:', responseData);
-            const paymentData = responseData?.data?.tableData as StudentPayments[];
+            const salaryData = responseData?.data?.tableData as TeacherSalary[];
             const pageCount = Math.ceil(responseData?.data?.metadata?.totalRows / pagination.pageSize);
             if (pageCount === 0) {
                 setTotalPage(() => 1);
             } else {
                 setTotalPage(() => pageCount);
             }
-            if (paymentData.length === 0) {
+            if (salaryData.length === 0) {
                 setData(() => []);
                 setIsLoading(false)
                 return;
             }
-            setData(() => paymentData);
+            setData(() => salaryData);
             setIsLoading(false)
         }
         else {
@@ -437,7 +454,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     }, [columnVisibility]);
 
     useEffect(() => {
-        studentPaymentTableData(
+        teachersSalaryTableData(
             {
                 itemsPerPage: pagination.pageSize,
                 currentPageNumber: pagination.pageIndex,
@@ -538,7 +555,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                 onClick={() => {
                                     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
 
-                                    studentPaymentTableData(
+                                    teachersSalaryTableData(
                                         {
                                             itemsPerPage: pagination.pageSize,
                                             currentPageNumber: 0,
@@ -563,7 +580,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                                     setYearFilter(currentYear.toString());
                                     setClassFilter("all");
 
-                                    studentPaymentTableData({
+                                    teachersSalaryTableData({
                                         itemsPerPage: pagination.pageSize,
                                         currentPageNumber: 0,
                                         sortOrder: "desc",
@@ -615,7 +632,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
                         session={accessToken}
                         studentList={studentList}
                         onCreateSuccess={() => {
-                            studentPaymentTableData({
+                            teachersSalaryTableData({
                                 itemsPerPage: pagination.pageSize,
                                 currentPageNumber: pagination.pageIndex,
                                 sortOrder: "desc",
@@ -759,4 +776,4 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     )
 }
 
-export default StudentPaymentsTable;
+export default TeachersSalaryTable;

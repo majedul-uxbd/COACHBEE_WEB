@@ -340,6 +340,18 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 										<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
 									</Link>
 								</MenuItem>
+
+								<MenuItem className="dark:bg-black">
+									<Link
+										className={cn(
+											isActiveRoute(`/${lng}/teachers-salary`) && "bg-accent p-2 cursor-pointer",
+											"flex items-center text-[13px] gap-2"
+										)}
+										href={`/${lng}/teachers-salary`}
+									>
+										<CircleDollarSign className="size-4" /> {t("sidebar.teachers_salary")}
+									</Link>
+								</MenuItem>
 							</SubMenu>
 						</Menu>
 					</>
