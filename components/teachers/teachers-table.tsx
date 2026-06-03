@@ -195,6 +195,14 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
         },
 
         {
+            accessorKey: "starting_month",
+            header: t("starting_month"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("starting_month")}</div>
+            ),
+        },
+
+        {
             accessorKey: "is_active",
             header: t("status"),
             cell: ({ row }) => {

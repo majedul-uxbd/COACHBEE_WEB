@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css"; // Import default styles
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";

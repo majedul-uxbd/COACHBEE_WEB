@@ -4,6 +4,7 @@ export interface Students {
     class: string;
     guardian_phone: number;
     address: string;
+    starting_month: string;
     monthly_fee: number;
     is_active: number;
     created_at: Date;

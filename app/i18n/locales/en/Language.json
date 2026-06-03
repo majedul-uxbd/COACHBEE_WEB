@@ -13,6 +13,7 @@
     "guardian_phone_hint": "Enter Guardian Phone Number",
     "class": "Class",
     "month": "Month",
+    "starting_month": "Starting Month",
     "year": "Year",
     "class_hint": "Select class",
     "address": "Address",
