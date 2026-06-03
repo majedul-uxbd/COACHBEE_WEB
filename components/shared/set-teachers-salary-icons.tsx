@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 
-const TeacherIcon = () => {
+const TeachersSalaryIcon = () => {
     const pathname = usePathname(); // Get the current path
     const lng = pathname.split("/")[1];
     const { t } = useTranslation(lng, "Language");
@@ -14,34 +14,34 @@ const TeacherIcon = () => {
 
     const iconSrc =
         theme === "dark"
-            ? "/coachbee/icons/teacher_dark.svg"
-            : "/coachbee/icons/teacher_light.svg";
+            ? "/coachbee/icons/teacher-salary-dark.svg"
+            : "/coachbee/icons/teacher-salary-light.svg";
 
     return (
         <>
-            <TooltipProvider>
+            {/* <TooltipProvider>
                 <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Image
-                            src={iconSrc}
-                            alt="Teachers"
-                            width={30}
-                            height={30}
-                            className="size-5 rounded-full"
-                        />
-                    </TooltipTrigger>
+                    <TooltipTrigger asChild> */}
+            <Image
+                src={iconSrc}
+                alt="Teachers"
+                width={30}
+                height={30}
+                className="size-5"
+            />
+            {/* </TooltipTrigger>
                     <TooltipContent
                         side="right"
                         align="center"
                         className="border p-2"
                     >
-                        {t("sidebar.teachers")}
+                        {t("sidebar.teachers_salary")}
                     </TooltipContent>
                 </Tooltip>
-            </TooltipProvider>
+            </TooltipProvider> */}
 
         </>
     );
 };
 
-export default TeacherIcon;
+export default TeachersSalaryIcon;

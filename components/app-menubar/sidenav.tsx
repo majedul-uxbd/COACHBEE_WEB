@@ -1,16 +1,9 @@
 "use client";
 
 import {
-	BriefcaseBusiness,
-	ChartLine,
 	CircleDollarSign,
 	LayoutDashboard,
-	Map,
-	MapPin,
 	MenuIcon,
-	Presentation,
-	Settings2,
-	StoreIcon,
 	UsersRound,
 	Wallet,
 } from "lucide-react";
@@ -27,6 +20,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import TeacherIcon from "../shared/set-teachers-icons";
 import { useTranslation } from "@/app/i18n/client";
+import TeachersSalaryIcon from "../shared/set-teachers-salary-icons";
 
 interface SidebarPageProps {
 	session: any;
@@ -217,91 +211,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 							</MenuItem>
 						</Menu>
 
-
-						{/* <Menu menuItemStyles={{
-							button: {
-								'&:hover': {
-									backgroundColor: 'transparent', // removes hover color
-								},
-							},
-						}}>
-							<SubMenu
-								className="cursor-pointer text-[14px]"
-								icon={
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Settings2 className="size-4" />
-											</TooltipTrigger>
-											<TooltipContent
-												side="right"
-												align="center"
-												className="border p-2"
-											>
-												Setup
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								}
-								label="Setup"
-							>
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute("/hrm-module/department") && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href="/hrm-module/department"
-									>
-										<BriefcaseBusiness className="size-4" /> Department
-									</Link>
-								</MenuItem>
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute("/hrm-module/designation") && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href="/hrm-module/designation"
-									>
-										<Presentation className="size-4" /> Designation
-									</Link>
-								</MenuItem>
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute("/hrm-module/zone") && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href="/hrm-module/zone"
-									>
-										<MapPin className="size-4" /> Zone
-									</Link>
-								</MenuItem>
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute("/hrm-module/region") && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href="/hrm-module/region"
-									>
-										<Map className="size-4" /> Region
-									</Link>
-								</MenuItem>
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute("/hrm-module/market") && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href="/hrm-module/market"
-									>
-										<StoreIcon className="size-4" /> Market
-									</Link>
-								</MenuItem>
-							</SubMenu>
-						</Menu>*/}
+						{/* Payroll SubMenu */}
 						<Menu menuItemStyles={{
 							button: {
 								'&:hover': {
@@ -329,29 +239,49 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								}
 								label={t("sidebar.payroll")}
 							>
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute(`/${lng}/student-payment`) && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href={`/${lng}/student-payment`}
-									>
-										<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
-									</Link>
-								</MenuItem>
+								{/* Student Fees */}
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<MenuItem className="dark:bg-black">
+												<Link
+													className={cn(
+														isActiveRoute(`/${lng}/student-payment`) && "bg-accent p-2 cursor-pointer",
+														"flex items-center text-[13px] gap-2"
+													)}
+													href={`/${lng}/student-payment`}
+												>
+													<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
+												</Link>
+											</MenuItem>
+										</TooltipTrigger>
+										<TooltipContent>
+											{t("sidebar.student_payments")}
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
 
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute(`/${lng}/teachers-salary`) && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href={`/${lng}/teachers-salary`}
-									>
-										<CircleDollarSign className="size-4" /> {t("sidebar.teachers_salary")}
-									</Link>
-								</MenuItem>
+								{/* Teachers Salary */}
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<MenuItem className="dark:bg-black">
+												<Link
+													className={cn(
+														isActiveRoute(`/${lng}/teachers-salary`) && "bg-accent p-2 cursor-pointer",
+														"flex items-center text-[13px] gap-2"
+													)}
+													href={`/${lng}/teachers-salary`}
+												>
+													<TeachersSalaryIcon />{t("sidebar.teachers_salary")}
+												</Link>
+											</MenuItem>
+										</TooltipTrigger>
+										<TooltipContent>
+											{t("sidebar.teachers_salary")}
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
 							</SubMenu>
 						</Menu>
 					</>
