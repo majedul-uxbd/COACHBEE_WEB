@@ -40,6 +40,7 @@ import { Badge } from "../ui/badge";
 import { useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { TeacherSalary } from "@/interfaces/teacher-salary.interface";
+import UpdateTeacherSalary from "./teachers-salary-payment";
 
 // import CreateStudent from "./create-student";
 // import ChangeStatusDialog from "./change-status";
@@ -212,7 +213,7 @@ const TeachersSalaryTable = ({ session }: TeachersSalaryTableProps) => {
             header: t("class"),
             cell: ({ row }) => {
                 let classes: string | number[] = row.getValue("class");
-                console.log(classes)
+                // console.log(classes)
 
                 // 👉 Step 1: Convert string "[6]" → [6]
                 if (typeof classes === "string") {
@@ -354,8 +355,8 @@ const TeachersSalaryTable = ({ session }: TeachersSalaryTableProps) => {
                             <DropdownMenuSeparator />
 
                             {/* Update Student Data */}
-                            {/* <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <UpdateStudentPayment
+                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
+                                <UpdateTeacherSalary
                                     accessToken={accessToken}
                                     salaryData={row.original}
                                     onUpdateTable={() => {
@@ -367,7 +368,7 @@ const TeachersSalaryTable = ({ session }: TeachersSalaryTableProps) => {
                                         });
                                     }}
                                 />
-                            </div> */}
+                            </div>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );

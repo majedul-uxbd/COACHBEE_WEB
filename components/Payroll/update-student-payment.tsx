@@ -213,7 +213,7 @@ const UpdateStudentPayment = ({ accessToken, paymentData, onUpdateTable }: Creat
                             )}
                         />
 
-                        {/* Amounts */}
+                        {/* Payable Amounts */}
                         <FormField
                             control={form.control}
                             name="totalPayableAmount"
@@ -231,6 +231,7 @@ const UpdateStudentPayment = ({ accessToken, paymentData, onUpdateTable }: Creat
                                 </FormItem>
                             )}
                         />
+
 
                         <FormField
                             control={form.control}

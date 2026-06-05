@@ -16,7 +16,7 @@ import { useTranslation } from '@/app/i18n/client'
 
 interface UpdateTeacherSalaryProps {
     accessToken: any
-    paymentData: any
+    salaryData: any
     onUpdateTable: () => void
 }
 
@@ -25,7 +25,8 @@ interface UpdateTeacherSalaryProps {
 //     "July", "August", "September", "October", "November", "December"
 // ]
 
-const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: UpdateTeacherSalaryProps) => {
+const UpdateTeacherSalary = ({ accessToken, salaryData, onUpdateTable }: UpdateTeacherSalaryProps) => {
+    console.log("🚀 ~ UpdateTeacherSalary ~ salaryData:", salaryData)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [buttonDisable, setButtonDisable] = useState(false)
     const pathname = usePathname();
@@ -36,25 +37,29 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
 
     // ✅ Schema
     const UpdateSchema = z.object({
-        studentId: z.string().min(1, "Student is required"),
-        month: z.string().min(1, "Month is required"),
-        year: z.string().min(1, "Year is required"),
+        teacherId: z.string().min(1, { message: t("please_enter_teacher_id") }),
+        month: z.string().min(1, { message: t("please_enter_month") }),
+        year: z.string().min(1, { message: t("please_enter_year") }),
+        bonus: z.number().min(0),
         totalPayableAmount: z.number().min(0),
         paidAmount: z.number().min(1, { message: t("please_enter_paid_amount") }), // ✅ Paid amount must be at least 1
         dueAmount: z.number().min(0),
-        paymentStatus: z.string().min(1)
+        paymentStatus: z.string().min(1),
+        notes: z.string().max(150, { message: t("maximum_length_address") }),
     })
 
     const form = useForm<z.infer<typeof UpdateSchema>>({
         resolver: zodResolver(UpdateSchema),
         defaultValues: {
-            studentId: paymentData.fullName,
-            month: paymentData.month,
-            year: paymentData.year,
-            totalPayableAmount: paymentData.totalPayableAmount,
-            paidAmount: paymentData.paidAmount,
-            dueAmount: paymentData.dueAmount,
-            paymentStatus: paymentData.paymentStatus
+            teacherId: salaryData.fullName,
+            month: salaryData.month,
+            year: salaryData.year,
+            bonus: salaryData.bonus,
+            totalPayableAmount: salaryData.totalPayableAmount,
+            paidAmount: salaryData.paidAmount,
+            dueAmount: salaryData.dueAmount,
+            paymentStatus: salaryData.paymentStatus,
+            notes: salaryData.notes
         },
     })
 
@@ -62,16 +67,18 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
     useEffect(() => {
         if (isDialogOpen) {
             form.reset({
-                studentId: String(paymentData.fullName),
-                month: paymentData.month,
-                year: String(paymentData.year),
-                totalPayableAmount: Number(paymentData.totalPayableAmount),
-                paidAmount: Number(paymentData.paidAmount),
-                dueAmount: Number(paymentData.dueAmount),
-                paymentStatus: paymentData.paymentStatus
+                teacherId: String(salaryData.fullName),
+                month: salaryData.month,
+                year: String(salaryData.year),
+                bonus: Number(salaryData.bonus),
+                totalPayableAmount: Number(salaryData.totalPayableAmount),
+                paidAmount: Number(salaryData.paidAmount),
+                dueAmount: Number(salaryData.dueAmount),
+                paymentStatus: salaryData.paymentStatus,
+                notes: salaryData.notes
             })
         }
-    }, [isDialogOpen, paymentData, form])
+    }, [isDialogOpen, salaryData, form])
 
     // ✅ Auto calculation
     const total = useWatch({ control: form.control, name: "totalPayableAmount" })
@@ -94,11 +101,11 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
 
     // ✅ Submit (UPDATE API)
     const onSubmit = async (values: z.infer<typeof UpdateSchema>) => {
-        console.log('🚀 ~ update-student-payment.tsx:100 ~ values:', values);
+        // console.log("🚀 ~ onSubmit ~ values:", values)
         setButtonDisable(true)
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/payroll/update-student-payment`,
+            `${process.env.NEXT_PUBLIC_API_URL}/payroll/update-teachers-salary`,
             {
                 method: 'POST',
                 headers: {
@@ -107,13 +114,15 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
                 },
                 body: JSON.stringify({
                     lg: lng,
-                    studentId: paymentData.studentId, // ✅ Needed to identify which payment to update
+                    teacherId: salaryData.teacherId, // ✅ Needed to identify which payment to update
                     month: values.month,
                     year: values.year,
+                    bonus: values.bonus,
                     totalPayableAmount: values.totalPayableAmount,
                     paidAmount: values.paidAmount,
                     dueAmount: values.dueAmount,
-                    paymentStatus: values.paymentStatus
+                    paymentStatus: values.paymentStatus,
+                    notes: values.notes
                 }),
             }
         )
@@ -140,7 +149,7 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
                 >
                     <div className="flex items-center -ml-1.5 gap-2">
                         <Edit className="h-4 w-4 text-green-600" />
-                        <span>{t("update_student_payment")}</span>
+                        <span>{t("update_teacher_salary")}</span>
                     </div>
                 </Button>
             </DialogTrigger>
@@ -148,23 +157,23 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
             <DialogContent className="w-full max-w-lg h-[85vh] flex flex-col">
                 <DialogHeader className="items-center">
                     <DialogTitle className="text-2xl font-semibold">
-                        {t('update_student_payment')}
+                        {t('update_teacher_salary')}
                     </DialogTitle>
                     <DialogDescription>
-                        {t('update_student_payment_dialog_description')}
+                        {t('update_teacher_salary_dialog_description')}
                     </DialogDescription>
                 </DialogHeader>
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full overflow-y-auto pr-2 flex-1">
 
-                        {/* Student */}
+                        {/* Teacher Name */}
                         <FormField
                             control={form.control}
-                            name="studentId"
+                            name="teacherId"
                             render={({ field }) => (
                                 <FormItem className="w-full">
-                                    <FormLabel>{t('student_name')}</FormLabel>
+                                    <FormLabel>{t('teacher_name')}</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
@@ -212,7 +221,7 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
                             )}
                         />
 
-                        {/* Amounts */}
+                        {/* Payable Amounts */}
                         <FormField
                             control={form.control}
                             name="totalPayableAmount"
@@ -231,6 +240,7 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
                             )}
                         />
 
+                        {/* Paid Amounts */}
                         <FormField
                             control={form.control}
                             name="paidAmount"
@@ -251,6 +261,28 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
                             )}
                         />
 
+                        {/* Bonus */}
+                        <FormField
+                            control={form.control}
+                            name="bonus"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('bonus')}</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            value={field.value}
+                                            onChange={(e) =>
+                                                field.onChange(e.target.valueAsNumber || 0)
+                                            }
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Deu Amount */}
                         <FormField
                             control={form.control}
                             name="dueAmount"
@@ -269,6 +301,7 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
                             )}
                         />
 
+                        {/* Salary Status */}
                         <FormField
                             control={form.control}
                             name="paymentStatus"
@@ -286,6 +319,24 @@ const UpdateTeacherSalary = ({ accessToken, paymentData, onUpdateTable }: Update
                                             <SelectItem value="DUE">DUE</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Notes */}
+                        <FormField
+                            control={form.control}
+                            name="notes"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('note')}</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            value={field.value}
+                                            onChange={(e) => field.onChange(e.target.value)}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />

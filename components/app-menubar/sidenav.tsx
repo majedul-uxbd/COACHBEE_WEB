@@ -88,7 +88,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 	const isActiveRoute = (route: string) => pathname === route; // Check if route is active
 
 	return (
-		<div className="z-1 border">
+		<div className="z-40 border">
 			<Sidebar
 				backgroundColor="bg-background"
 				collapsed={collapsed}
@@ -240,48 +240,48 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								label={t("sidebar.payroll")}
 							>
 								{/* Student Fees */}
-								<TooltipProvider>
+								{/* <TooltipProvider>
 									<Tooltip>
-										<TooltipTrigger asChild>
-											<MenuItem className="dark:bg-black">
-												<Link
-													className={cn(
-														isActiveRoute(`/${lng}/student-payment`) && "bg-accent p-2 cursor-pointer",
-														"flex items-center text-[13px] gap-2"
-													)}
-													href={`/${lng}/student-payment`}
-												>
-													<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
-												</Link>
-											</MenuItem>
-										</TooltipTrigger>
+										<TooltipTrigger asChild> */}
+								<MenuItem className="dark:bg-black">
+									<Link
+										className={cn(
+											isActiveRoute(`/${lng}/student-payment`) && "bg-accent p-2 cursor-pointer",
+											"flex items-center text-[13px] gap-2"
+										)}
+										href={`/${lng}/student-payment`}
+									>
+										<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
+									</Link>
+								</MenuItem>
+								{/* </TooltipTrigger>
 										<TooltipContent>
 											{t("sidebar.student_payments")}
 										</TooltipContent>
 									</Tooltip>
-								</TooltipProvider>
+								</TooltipProvider> */}
 
 								{/* Teachers Salary */}
-								<TooltipProvider>
+								{/* <TooltipProvider>
 									<Tooltip>
-										<TooltipTrigger asChild>
-											<MenuItem className="dark:bg-black">
-												<Link
-													className={cn(
-														isActiveRoute(`/${lng}/teachers-salary`) && "bg-accent p-2 cursor-pointer",
-														"flex items-center text-[13px] gap-2"
-													)}
-													href={`/${lng}/teachers-salary`}
-												>
-													<TeachersSalaryIcon />{t("sidebar.teachers_salary")}
-												</Link>
-											</MenuItem>
-										</TooltipTrigger>
+										<TooltipTrigger asChild> */}
+								<MenuItem className="dark:bg-black">
+									<Link
+										className={cn(
+											isActiveRoute(`/${lng}/teachers-salary`) && "bg-accent p-2 cursor-pointer",
+											"flex items-center text-[13px] gap-2"
+										)}
+										href={`/${lng}/teachers-salary`}
+									>
+										<TeachersSalaryIcon />{t("sidebar.teachers_salary")}
+									</Link>
+								</MenuItem>
+								{/* </TooltipTrigger>
 										<TooltipContent>
 											{t("sidebar.teachers_salary")}
 										</TooltipContent>
 									</Tooltip>
-								</TooltipProvider>
+								</TooltipProvider> */}
 							</SubMenu>
 						</Menu>
 					</>

@@ -88,6 +88,9 @@
     "profile": "Profile",
     "columns": "Columns",
     "toggle_columns": "Toggle Columns",
+    "teacher_name": "Teacher Name",
+    "update_teacher_salary": "Update Teacher Salary",
+    "update_teacher_salary_dialog_description": "Fill in the details below to update the teacher salary.",
     "sidebar": {
         "dashboard": "Dashboard",
         "students": "Students",
