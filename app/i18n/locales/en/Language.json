@@ -9,6 +9,7 @@
     "student_id": "Student ID",
     "full_name": "Full Name",
     "full_name_hint": "Enter Full Name",
+    "email_hint": "john@example.com",
     "guardian_phone": "Guardian Phone",
     "guardian_phone_hint": "Enter Guardian Phone Number",
     "class": "Class",
@@ -97,7 +98,8 @@
         "teachers": "Teachers",
         "payroll": "Payroll",
         "student_payments": "Student Fees",
-        "teachers_salary": "Teachers Salary"
+        "teachers_salary": "Teachers Salary",
+        "attendance": "Attendance"
     },
     "search_hint": {
         "search_by_full_name": "Search by Full name..."

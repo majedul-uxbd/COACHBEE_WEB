@@ -171,6 +171,14 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
         },
 
         {
+            accessorKey: "email",
+            header: t("email"),
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{highlightText(row.getValue("email") as string, globalFilter)}</div>
+            ),
+        },
+
+        {
             accessorKey: "phone",
             header: t("phone"),
             cell: ({ row }) => (

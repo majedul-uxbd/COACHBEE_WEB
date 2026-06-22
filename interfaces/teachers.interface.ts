@@ -2,6 +2,7 @@ export interface Teachers {
     id: number;
     full_name: string;
     class: string;
+    email: string;
     phone: number;
     address: string;
     starting_month: string;

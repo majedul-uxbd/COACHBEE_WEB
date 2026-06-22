@@ -9,6 +9,7 @@
     "student_id": "ছাত্র আইডি",
     "full_name": "পূর্ণ নাম",
     "full_name_hint": "পূর্ণ নাম লিখুন",
+    "email_hint": "john@example.com",
     "guardian_phone": "অভিভাবকের ফোন",
     "guardian_phone_hint": "অভিভাবকের ফোন নম্বর লিখুন",
     "class": "ক্লাস",
@@ -97,7 +98,8 @@
         "teachers": "শিক্ষকবৃন্দ",
         "payroll": "বেতন তালিকা",
         "student_payments": "শিক্ষার্থীদের ফি",
-        "teachers_salary": "শিক্ষকদের বেতন"
+        "teachers_salary": "শিক্ষকদের বেতন",
+        "attendance": "উপস্থিতি"
     },
     "search_hint": {
         "search_by_full_name": "পূর্ণ নাম দিয়ে অনুসন্ধান করুন..."

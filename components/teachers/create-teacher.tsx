@@ -50,6 +50,7 @@ const CreateTeacher = ({
             z.number()
         ).min(1, { message: t("class_is_required") })
         ,
+        email: z.string().email({ message: t('invalid_email') }),
         phone: z.string().refine((val) => isValidPhoneNumber(val), {
             message: t('invalid_phone_number'),
         }),
@@ -67,6 +68,7 @@ const CreateTeacher = ({
         defaultValues: {
             fullName: '',
             class: [],
+            email: '',
             phone: '',
             address: '',
             salary: ''
@@ -89,6 +91,7 @@ const CreateTeacher = ({
                     lg: lng,
                     fullName: values.fullName,
                     class: values.class,
+                    email: values.email,
                     phone: values.phone,
                     address: values.address,
                     salary: values.salary
@@ -196,6 +199,21 @@ const CreateTeacher = ({
                                             </PopoverContent>
                                         </Popover>
 
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Email Field */}
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('email')}</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder={t("email_hint")} />
+                                        </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}

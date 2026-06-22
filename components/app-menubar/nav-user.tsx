@@ -82,6 +82,11 @@ export function NavUser({ session }: any) {
                                     Super Admin
                                 </Badge>
                             )}
+                            {session?.role === 'teacher' && (
+                                <Badge variant="default" className="text-xs mt-1">
+                                    Teacher
+                                </Badge>
+                            )}
                         </div>
                     </div>
                     <Separator />

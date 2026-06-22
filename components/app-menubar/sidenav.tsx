@@ -27,6 +27,7 @@ interface SidebarPageProps {
 }
 
 const SidebarPage = ({ session }: SidebarPageProps) => {
+	// console.log('🚀 ~ sidenav.tsx:30 ~ session:', session);
 	const [collapsed, setCollapsed] = useState<boolean | null>(null);
 	const [isMobile, setIsMobile] = useState(false);
 	const pathname = usePathname(); // Get the current path
@@ -107,184 +108,222 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 							<MenuIcon className="ml-2 size-6" />
 						</MenuItem>
 					</Menu>
-					<>
-						{/* Dashboard Menu Item */}
-						<Menu className="h-full" menuItemStyles={{
-							button: {
-								'&:hover': {
-									backgroundColor: 'transparent', // removes hover color
+					{session?.role === "admin" && (
+						<>
+							{/* Dashboard Menu Item */}
+							<Menu className="h-full" menuItemStyles={{
+								button: {
+									'&:hover': {
+										backgroundColor: 'transparent', // removes hover color
+									},
 								},
-							},
-						}}>
-							<MenuItem
-								component={<Link href={`/${lng}/home`} />}
-								className={cn(isActiveRoute(`/${lng}/home`) && "bg-accent")}
-								icon={
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<LayoutDashboard className="size-4" />
-											</TooltipTrigger>
-											<TooltipContent
-												side="right"
-												align="center"
-												className="border p-2"
-											>
-												{t("sidebar.dashboard")}
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								}
-							>
-								<p className="text-[14px]">
-									{t("sidebar.dashboard")}
-								</p>
-							</MenuItem>
-						</Menu>
+							}}>
+								<MenuItem
+									component={<Link href={`/${lng}/home`} />}
+									className={cn(isActiveRoute(`/${lng}/home`) && "bg-accent")}
+									icon={
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<LayoutDashboard className="size-4" />
+												</TooltipTrigger>
+												<TooltipContent
+													side="right"
+													align="center"
+													className="border p-2"
+												>
+													{t("sidebar.dashboard")}
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									}
+								>
+									<p className="text-[14px]">
+										{t("sidebar.dashboard")}
+									</p>
+								</MenuItem>
+							</Menu>
 
-						{/* Teachers Menu Item */}
-						<Menu menuItemStyles={{
-							button: {
-								'&:hover': {
-									backgroundColor: 'transparent', // removes hover color
+							{/* Teachers Menu Item */}
+							<Menu menuItemStyles={{
+								button: {
+									'&:hover': {
+										backgroundColor: 'transparent', // removes hover color
+									},
 								},
-							},
-						}}>
-							<MenuItem
-								component={<Link href={`/${lng}/teachers`} />}
-								className={cn(isActiveRoute(`/${lng}/teachers`) && "bg-accent")}
-								icon={
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												{/* <UsersRound className="size-4" /> */}
-												<TeacherIcon />
-											</TooltipTrigger>
-											<TooltipContent
-												side="right"
-												align="center"
-												className="border p-2"
-											>
-												{t("sidebar.teachers")}
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								}
-							>
-								<p className="text-[14px]">
-									{t("sidebar.teachers")}
-								</p>
-							</MenuItem>
-						</Menu>
+							}}>
+								<MenuItem
+									component={<Link href={`/${lng}/teachers`} />}
+									className={cn(isActiveRoute(`/${lng}/teachers`) && "bg-accent")}
+									icon={
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													{/* <UsersRound className="size-4" /> */}
+													<TeacherIcon />
+												</TooltipTrigger>
+												<TooltipContent
+													side="right"
+													align="center"
+													className="border p-2"
+												>
+													{t("sidebar.teachers")}
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									}
+								>
+									<p className="text-[14px]">
+										{t("sidebar.teachers")}
+									</p>
+								</MenuItem>
+							</Menu>
 
-						{/* Students Menu Item */}
-						<Menu menuItemStyles={{
-							button: {
-								'&:hover': {
-									backgroundColor: 'transparent', // removes hover color
+							{/* Students Menu Item */}
+							<Menu menuItemStyles={{
+								button: {
+									'&:hover': {
+										backgroundColor: 'transparent', // removes hover color
+									},
 								},
-							},
-						}}>
-							<MenuItem
-								component={<Link href={`/${lng}/students`} />}
-								className={cn(isActiveRoute(`/${lng}/students`) && "bg-accent")}
-								icon={
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<UsersRound className="size-4" />
-											</TooltipTrigger>
-											<TooltipContent
-												side="right"
-												align="center"
-												className="border p-2"
-											>
-												{t("sidebar.students")}
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								}
-							>
-								<p className="text-[14px]">
-									{t("sidebar.students")}
-								</p>
-							</MenuItem>
-						</Menu>
+							}}>
+								<MenuItem
+									component={<Link href={`/${lng}/students`} />}
+									className={cn(isActiveRoute(`/${lng}/students`) && "bg-accent")}
+									icon={
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<UsersRound className="size-4" />
+												</TooltipTrigger>
+												<TooltipContent
+													side="right"
+													align="center"
+													className="border p-2"
+												>
+													{t("sidebar.students")}
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									}
+								>
+									<p className="text-[14px]">
+										{t("sidebar.students")}
+									</p>
+								</MenuItem>
+							</Menu>
 
-						{/* Payroll SubMenu */}
-						<Menu menuItemStyles={{
-							button: {
-								'&:hover': {
-									backgroundColor: 'transparent', // removes hover color
+							{/* Payroll SubMenu */}
+							<Menu menuItemStyles={{
+								button: {
+									'&:hover': {
+										backgroundColor: 'transparent', // removes hover color
+									},
 								},
-							},
-						}}>
-							<SubMenu
-								className="cursor-pointer text-[14px]"
-								icon={
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Wallet className="size-4" />
-											</TooltipTrigger>
-											<TooltipContent
-												side="right"
-												align="center"
-												className="border p-2"
-											>
-												{t("sidebar.payroll")}
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								}
-								label={t("sidebar.payroll")}
-							>
-								{/* Student Fees */}
-								{/* <TooltipProvider>
+							}}>
+								<SubMenu
+									className="cursor-pointer text-[14px]"
+									icon={
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Wallet className="size-4" />
+												</TooltipTrigger>
+												<TooltipContent
+													side="right"
+													align="center"
+													className="border p-2"
+												>
+													{t("sidebar.payroll")}
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									}
+									label={t("sidebar.payroll")}
+								>
+									{/* Student Fees */}
+									{/* <TooltipProvider>
 									<Tooltip>
 										<TooltipTrigger asChild> */}
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute(`/${lng}/student-payment`) && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href={`/${lng}/student-payment`}
-									>
-										<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
-									</Link>
-								</MenuItem>
-								{/* </TooltipTrigger>
+									<MenuItem className="dark:bg-black">
+										<Link
+											className={cn(
+												isActiveRoute(`/${lng}/student-payment`) && "bg-accent p-2 cursor-pointer",
+												"flex items-center text-[13px] gap-2"
+											)}
+											href={`/${lng}/student-payment`}
+										>
+											<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
+										</Link>
+									</MenuItem>
+									{/* </TooltipTrigger>
 										<TooltipContent>
 											{t("sidebar.student_payments")}
 										</TooltipContent>
 									</Tooltip>
 								</TooltipProvider> */}
 
-								{/* Teachers Salary */}
-								{/* <TooltipProvider>
+									{/* Teachers Salary */}
+									{/* <TooltipProvider>
 									<Tooltip>
 										<TooltipTrigger asChild> */}
-								<MenuItem className="dark:bg-black">
-									<Link
-										className={cn(
-											isActiveRoute(`/${lng}/teachers-salary`) && "bg-accent p-2 cursor-pointer",
-											"flex items-center text-[13px] gap-2"
-										)}
-										href={`/${lng}/teachers-salary`}
-									>
-										<TeachersSalaryIcon />{t("sidebar.teachers_salary")}
-									</Link>
-								</MenuItem>
-								{/* </TooltipTrigger>
+									<MenuItem className="dark:bg-black">
+										<Link
+											className={cn(
+												isActiveRoute(`/${lng}/teachers-salary`) && "bg-accent p-2 cursor-pointer",
+												"flex items-center text-[13px] gap-2"
+											)}
+											href={`/${lng}/teachers-salary`}
+										>
+											<TeachersSalaryIcon />{t("sidebar.teachers_salary")}
+										</Link>
+									</MenuItem>
+									{/* </TooltipTrigger>
 										<TooltipContent>
 											{t("sidebar.teachers_salary")}
 										</TooltipContent>
 									</Tooltip>
 								</TooltipProvider> */}
-							</SubMenu>
-						</Menu>
-					</>
+								</SubMenu>
+							</Menu>
+						</>
+					)}
+					{(session?.role === "admin" || session?.role === "teacher") && (
+						<>
+							{/* Students Attendance Menu Item */}
+							<Menu menuItemStyles={{
+								button: {
+									'&:hover': {
+										backgroundColor: 'transparent', // removes hover color
+									},
+								},
+							}}>
+								<MenuItem
+									component={<Link href={`/${lng}/attendance`} />}
+									className={cn(isActiveRoute(`/${lng}/attendance`) && "bg-accent")}
+									icon={
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<UsersRound className="size-4" />
+												</TooltipTrigger>
+												<TooltipContent
+													side="right"
+													align="center"
+													className="border p-2"
+												>
+													{t("sidebar.attendance")}
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									}
+								>
+									<p className="text-[14px]">
+										{t("sidebar.attendance")}
+									</p>
+								</MenuItem>
+							</Menu>
+						</>)}
 				</div>
 			</Sidebar >
 
