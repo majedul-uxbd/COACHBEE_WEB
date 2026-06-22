@@ -4,6 +4,7 @@ import {
 	CircleDollarSign,
 	LayoutDashboard,
 	MenuIcon,
+	UserCheck2,
 	UsersRound,
 	Wallet,
 } from "lucide-react";
@@ -305,7 +306,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 										<TooltipProvider>
 											<Tooltip>
 												<TooltipTrigger asChild>
-													<UsersRound className="size-4" />
+													<UserCheck2 className="size-4" />
 												</TooltipTrigger>
 												<TooltipContent
 													side="right"

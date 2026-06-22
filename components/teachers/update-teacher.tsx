@@ -34,6 +34,7 @@ interface UpdateTeacherProps {
     onUpdateTable(): void;
 }
 const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: UpdateTeacherProps) => {
+    console.log('🚀 ~ update-teacher.tsx:37 ~ teacherData:', teacherData);
     const authToken = accessToken;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);
@@ -68,6 +69,8 @@ const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: Upd
 
         class: z.array(z.number()).min(1, { message: t("class_is_required") }),
 
+        email: z.string().email({ message: t('invalid_email') }),
+
         phone: z.string().refine((val) => isValidPhoneNumber(val), {
             message: t('invalid_phone_number'),
         }),
@@ -85,6 +88,7 @@ const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: Upd
         defaultValues: {
             fullName: teacherData.full_name || '',
             class: defaultClassValues,
+            email: teacherData.email || '',
             phone: teacherData.phone || '',
             address: teacherData.address || '',
             salary: teacherData.salary || ""
@@ -107,6 +111,7 @@ const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: Upd
                     id: teacherData.id,
                     fullName: values.fullName,
                     class: values.class, // ✅ sending number[]
+                    email: values.email,
                     phone: values.phone,
                     address: values.address,
                     salary: values.salary,
@@ -246,6 +251,21 @@ const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: Upd
                                         </FormItem>
                                     );
                                 }}
+                            />
+
+                            {/* Email Field */}
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('email')}</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder={t("email_hint")} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
                             />
 
                             {/* Phone */}
