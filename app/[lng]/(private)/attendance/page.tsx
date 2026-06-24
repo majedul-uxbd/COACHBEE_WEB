@@ -1,13 +1,12 @@
 import { auth } from "@/auth";
-import StudentsTable from "@/components/students/student-table";
+import AttendanceTable from "@/components/attendance/attendance-table";
 
-const Page = async ({ session }: { session: any }) => {
+
+const AttendancePage = async () => {
+    const session = await auth();
     return (
-        <div>
-            Attendance Page
-        </div>
-        // <StudentsTable session={session} />
+        <AttendanceTable session={session} />
     );
 };
 
-export default Page;
+export default AttendancePage;

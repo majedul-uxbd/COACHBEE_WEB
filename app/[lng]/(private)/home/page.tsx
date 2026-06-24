@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import Page from "../attendance/page";
+import AttendancePage from "../attendance/page";
 
 const page = async () => {
 	const session = await auth();
@@ -8,7 +8,7 @@ const page = async () => {
 			{session?.user?.role === "admin" ? (
 				<h1>Admin Dashboard</h1>
 			) : session?.user?.role === "teacher" ? (
-				<Page session={session} />
+				<AttendancePage />
 			) : (
 				<h1>Dashboard Page</h1>
 			)}

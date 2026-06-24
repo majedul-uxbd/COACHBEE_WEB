@@ -92,6 +92,8 @@
     "teacher_name": "শিক্ষকের নাম",
     "update_teacher_salary": "শিক্ষকের বেতন আপডেট করুন",
     "update_teacher_salary_dialog_description": "শিক্ষকের বেতন আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।",
+    "present": "উপস্থিত",
+    "absent": "অনুপস্থিত",
     "sidebar": {
         "dashboard": "ড্যাশবোর্ড",
         "students": "শিক্ষার্থীবৃন্দ",

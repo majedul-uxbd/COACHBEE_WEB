@@ -34,7 +34,6 @@ interface UpdateTeacherProps {
     onUpdateTable(): void;
 }
 const UpdateTeacher = ({ accessToken, teacherData, classes, onUpdateTable }: UpdateTeacherProps) => {
-    console.log('🚀 ~ update-teacher.tsx:37 ~ teacherData:', teacherData);
     const authToken = accessToken;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [buttonDisable, setButtonDisable] = useState(false);

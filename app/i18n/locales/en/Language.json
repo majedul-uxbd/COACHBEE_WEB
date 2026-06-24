@@ -92,6 +92,8 @@
     "teacher_name": "Teacher Name",
     "update_teacher_salary": "Update Teacher Salary",
     "update_teacher_salary_dialog_description": "Fill in the details below to update the teacher salary.",
+    "present": "Present",
+    "absent": "Absent",
     "sidebar": {
         "dashboard": "Dashboard",
         "students": "Students",
