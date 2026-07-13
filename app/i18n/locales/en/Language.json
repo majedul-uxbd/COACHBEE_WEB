@@ -94,6 +94,10 @@
     "update_teacher_salary_dialog_description": "Fill in the details below to update the teacher salary.",
     "present": "Present",
     "absent": "Absent",
+    "late": "Late",
+    "no_results_found": "No results found",
+    "no_data_matched": "No data matched",
+    "select_class": "Select Class",
     "sidebar": {
         "dashboard": "Dashboard",
         "students": "Students",

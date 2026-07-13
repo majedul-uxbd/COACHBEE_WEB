@@ -45,9 +45,7 @@ const CreateStudent = ({
             .min(1, { message: t('fullname_is_required') })
             .max(100, { message: t('maximum_length_name') }),
 
-        class: z.array(
-            z.number()
-        ).min(1, { message: t("class_is_required") }),
+        class: z.string().min(1, { message: t("class_is_required") }),
 
         guardianPhone: z.string().refine((val) => isValidPhoneNumber(val), {
             message: t('invalid_phone_number'),
@@ -67,16 +65,17 @@ const CreateStudent = ({
         resolver: zodResolver(CreateSchema),
         defaultValues: {
             fullName: '',
-            class: [],
+            class: '',
             guardianPhone: '',
             address: '',
-            monthly_fee: ""
+            monthly_fee: ''
         },
     });
 
 
     const onSubmit = async (values: z.infer<typeof CreateSchema>) => {
-        console.log('🚀 ~ create-student.tsx:99 ~ values:', values);
+        // console.log('🚀 ~ create-student.tsx:99 ~ values:', values);
+
         setButtonDisable(true);
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/students/create`,
@@ -162,7 +161,7 @@ const CreateStudent = ({
                                                         role="combobox"
                                                         className="justify-between"
                                                     >
-                                                        {field.value?.length ? field.value.join(", ") : "Select classes"}
+                                                        {field.value ? field.value : "Select class"}
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
@@ -173,17 +172,13 @@ const CreateStudent = ({
                                                     <CommandInput placeholder="Search classes..." />
                                                     <CommandList>
                                                         <CommandEmpty>No classes found</CommandEmpty>
-                                                        <CommandGroup className="grid grid-cols-2 gap-2">
+                                                        <CommandGroup className="grid grid-cols-1 gap-2">
                                                             {classes.map((cls: any) => {
-                                                                const isSelected = field.value?.includes(cls.id);
+                                                                const isSelected = field.value === cls.class_name;
                                                                 return (
                                                                     <CommandItem
                                                                         key={cls.id}
-                                                                        onSelect={() =>
-                                                                            isSelected
-                                                                                ? field.onChange(field.value.filter((v: number) => v !== cls.id))
-                                                                                : field.onChange([...(field.value || []), cls.id])
-                                                                        }
+                                                                        onSelect={() => field.onChange(cls.class_name)}
                                                                         className="flex items-center"
                                                                     >
                                                                         <Checkbox checked={isSelected} className="mr-2" />

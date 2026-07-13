@@ -1,24 +1,45 @@
 "use client";
-import { AttendanceData } from "@/interfaces/attendance.interface";
-import { ColumnDef, ColumnFiltersState, ColumnVisibility, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, PaginationState, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { Checkbox } from "../ui/checkbox";
+
 import { useCallback, useEffect, useState } from "react";
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    PaginationState,
+    SortingState,
+    useReactTable,
+    VisibilityState,
+} from '@tanstack/react-table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizontalIcon, Settings2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
-import { ChevronLeftIcon, ChevronRightIcon, Loader2Icon, MoreHorizontalIcon, Settings2 } from "lucide-react";
-import { Input } from "../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Separator } from "../ui/separator";
-import { ScrollArea } from "../ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Checkbox } from "../ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Calendar } from "../ui/calendar";
+import { AttendanceData } from "@/interfaces/attendance.interface";
 import { toast } from "sonner";
 
 
-interface AttendanceTableProps {
-    session: any
+interface StudentPaymentsTableProps {
+    session: any;
 }
 
 
@@ -41,29 +62,12 @@ const highlightText = (text: string, search: string) => {
     );
 };
 
-const AttendanceRadio = ({
-    checked,
-    onClick,
-}: {
-    checked: boolean;
-    onClick?: () => void;
-}) => (
-    <div
-        onClick={onClick}
-        className={`h-8 w-8 rounded-full border flex items-center justify-center cursor-pointer ${checked ? "border-green-500" : "border-gray-300"
-            }`}
-    >
-        {checked && (
-            <div className="h-5 w-5 rounded-full bg-emerald-500" />
-        )}
-    </div>
-);
 
-const AttendanceTable = ({ session }: AttendanceTableProps) => {
-    // console.log('🚀 ~ attendance-table.tsx:59 ~ session:', session);
+
+const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     const accessToken = session?.user?.id;
     const [data, setData] = useState<AttendanceData[]>([]);
-    const [classes, setClasses] = useState<any[]>([]);
+    const [studentClass, setStudentClass] = useState<string>("");
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
@@ -71,6 +75,7 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
         pageIndex: 0,
         pageSize: 10,
     });
+    const [date, setDate] = useState<Date>()
     const [globalFilter, setGlobalFilter] = useState("");
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [rowSelection, setRowSelection] = useState({})
@@ -78,87 +83,33 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
     const lng = pathname.split("/")[1];
     const { t } = useTranslation(lng, "Language");
 
-    const handleAttendanceChange = async (studentId: number, isPresent: boolean) => {
-        const studentIndex = data.findIndex((item) => (item.studentId || item.id) === studentId);
-        if (studentIndex === -1) return;
+    const [classList, setClassList] = useState<any[]>([]); // State to hold the class list
+    const [attendanceSelections, setAttendanceSelections] = useState<
+        { studentId: string; status: "present" | "absent" | "late" }[]
+    >([]);
 
-        const currentStudent = data[studentIndex];
-        if (isPresent && currentStudent.present) return;
-        if (!isPresent && currentStudent.absent) return;
-
-        const previousData = [...data];
-
-        // 1. Update local state optimistically
-        const updatedData = [...data];
-        updatedData[studentIndex] = {
-            ...updatedData[studentIndex],
-            present: isPresent,
-            absent: !isPresent,
-        };
-        setData(updatedData);
-
-        // Get local date format: YYYY-MM-DD
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const dateString = `${year}-${month}-${day}`;
-
-        // 2. Send POST request with 1 and 0 values
-        try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/attendance/mark-attendance`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({
-                        studentId,
-                        date: dateString,
-                        present: isPresent ? 1 : 0,
-                        absent: isPresent ? 0 : 1,
-                    }),
-                },
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to save attendance");
-            }
-
-            const resData = await response.json();
-            console.log("🚀 ~ handleAttendanceChange ~ resData:", resData)
-            if (resData.status === 'success' || resData.success) {
-                toast.success(resData.message || "Attendance updated successfully");
-            } else {
-                toast.success("Attendance updated successfully");
-            }
-        } catch (error) {
-            console.error("Error updating attendance:", error);
-            toast.error("Failed to update attendance on the server.");
-            // Revert state on error
-            setData(previousData);
-        }
+    const getRowStudentId = (row: AttendanceData) => {
+        const anyRow = row as any;
+        return `${anyRow.id ?? anyRow.studentId ?? anyRow.student_id ?? ""}`;
     };
 
-
-    // 🔹 Load saved visibility from localStorage (if exists)
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-        () => {
-            if (typeof window !== "undefined") {
-                const saved = localStorage.getItem("storeTableColumnVisibility");
-                return saved ? JSON.parse(saved) : {};
+    const handleAttendanceSelection = (
+        studentId: string,
+        status: "present" | "absent" | "late"
+    ) => {
+        setAttendanceSelections((prev) => {
+            const existing = prev.find((item) => item.studentId === studentId);
+            if (existing) {
+                return prev.map((item) =>
+                    item.studentId === studentId ? { ...item, status } : item
+                );
             }
-            return {};
-        }
-    );
-
-    const classMap = Object.fromEntries(
-        classes.map((cls: any) => [cls.id, cls.class_name])
-    );
-
+            return [...prev, { studentId, status }];
+        });
+    };
+    console.log('🚀 attendanceSelections:', attendanceSelections);
     const columns: ColumnDef<AttendanceData>[] = [
+
         {
             id: "select",
             header: ({ table }) => (
@@ -183,95 +134,80 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
             enableHiding: false,
         },
 
-
         {
-            accessorKey: "full_name",
+            accessorKey: "fullName",
             header: t("full_name"),
             cell: ({ row }) => {
-                const fullName = row.getValue("full_name") as string;
+                const fullName = row.getValue("fullName") as string;
                 return <div className="whitespace-nowrap text-start">{highlightText(fullName, globalFilter)}</div>;
             },
         },
 
         {
-            accessorKey: "class",
-            header: t("class"),
+            id: "present",
+            header: t("present"),
             cell: ({ row }) => {
-                const classString = row.getValue("class");
-
-                let classArray: number[] = [];
-
-                // 🔥 Handle both string and array (future-proof)
-                if (typeof classString === "string") {
-                    try {
-                        classArray = JSON.parse(classString);
-                    } catch {
-                        classArray = [];
-                    }
-                } else if (Array.isArray(classString)) {
-                    classArray = classString;
-                }
-
-                const formattedClass = classArray
-                    .map((id: number) => classMap[id])
-                    .filter(Boolean)
-                    .join(", ");
-
+                const studentId = getRowStudentId(row.original);
+                const selected = attendanceSelections.find((item) => item.studentId === studentId)?.status === "present";
                 return (
-                    <div className="whitespace-nowrap">
-                        {formattedClass
-                            ? highlightText(formattedClass, globalFilter)
-                            : "N/A"}
+                    <div className="flex justify-center">
+                        <input
+                            type="radio"
+                            name={`attendance-${studentId}`}
+                            value="1"
+                            checked={selected}
+                            onChange={() => handleAttendanceSelection(studentId, "present")}
+                            className="accent-emerald-500"
+                        />
                     </div>
                 );
             },
         },
         {
-            id: "present",
-            header: t("present"),
-            cell: ({ row }) => (
-                <AttendanceRadio
-                    checked={Boolean(row.original.present)}
-                    onClick={() => handleAttendanceChange(row.original.studentId || row.original.id, true)}
-                />
-            ),
-        },
-        {
             id: "absent",
             header: t("absent"),
-            cell: ({ row }) => (
-                <AttendanceRadio
-                    checked={Boolean(row.original.absent)}
-                    onClick={() => handleAttendanceChange(row.original.studentId || row.original.id, false)}
-                />
-            ),
+            cell: ({ row }) => {
+                const studentId = getRowStudentId(row.original);
+                const selected = attendanceSelections.find((item) => item.studentId === studentId)?.status === "absent";
+                return (
+                    <div className="flex justify-center">
+                        <input
+                            type="radio"
+                            name={`attendance-${studentId}`}
+                            value="1"
+                            checked={selected}
+                            onChange={() => handleAttendanceSelection(studentId, "absent")}
+                            className="accent-red-500"
+                        />
+                    </div>
+                );
+            },
         },
-        // {
-        //     id: "leave",
-        //     header: "Leave",
-        //     cell: ({ row }) => (
-        //         <AttendanceRadio
-        //             checked={row.original.status === "leave"}
-        //         />
-        //     ),
-        // },
-        // {
-        //     id: "note",
-        //     header: "Note",
-        //     cell: () => (
-        //         <button className="text-gray-500 hover:text-gray-700">
-        //             Note
-        //         </button>
-        //     ),
-        // },
-
         {
-            id: 'actions',
+            id: "late",
+            header: t("late"),
+            cell: ({ row }) => {
+                const studentId = getRowStudentId(row.original);
+                const selected = attendanceSelections.find((item) => item.studentId === studentId)?.status === "late";
+                return (
+                    <div className="flex justify-center">
+                        <input
+                            type="radio"
+                            name={`attendance-${studentId}`}
+                            value="1"
+                            checked={selected}
+                            onChange={() => handleAttendanceSelection(studentId, "late")}
+                            className="accent-yellow-500"
+                        />
+                    </div>
+                );
+            },
+        },
+        {
+            id: "actions",
             header: t("actions"),
             enableHiding: false,
             cell: ({ row }) => {
-                // const isActive = row.original.is_active === 1;
-
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -285,22 +221,26 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
                             <DropdownMenuSeparator />
 
                             {/* Update Student Data */}
-                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <h1>Update</h1>
-                            </div>
-
-                            {/* Change Student Status */}
-                            <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
-                                <h1>Change Status</h1>
-                            </div>
+                            {/* <div className='flex w-full flex-row justify-start items-center hover:rounded-md'>
+                                <UpdateStudentPayment
+                                    accessToken={accessToken}
+                                    studentList={row.original}
+                                    onUpdateTable={() => {
+                                        studentListData({
+                                            itemsPerPage: pagination.pageSize,
+                                            currentPageNumber: pagination.pageIndex,
+                                            sortOrder: "asc",
+                                            filterBy: "",
+                                        });
+                                    }}
+                                />
+                            </div> */}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
             },
         }
-    ];
-
-
+    ]
     const handlePaginationState = useCallback(async (btnType: "prev" | "next" | "last" | "first" = "next") => {
         const factor = btnType === "next" ? 1 : -1;
 
@@ -310,7 +250,8 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
         }))
     }, [])
 
-    const getAttendanceData = async (paginationData: any) => {
+    const studentListData = async (filters?: any) => {
+        console.log('🚀 ~ attendance-table.tsx:253 ~ filters:', filters);
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/attendance/student-list`,
             {
@@ -320,38 +261,27 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
                     'Authorization': `bearer ${accessToken}`
                 },
                 body: JSON.stringify({
-                    paginationData
+                    studentClass: filters
                 }),
             },
         );
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log('🚀 ~ student-table.tsx:319 ~ responseData:', responseData);
-            const studentData = responseData?.data?.tableData as AttendanceData[];
-            const pageCount = Math.ceil(responseData?.data?.metadata?.totalRows / pagination.pageSize);
-            if (pageCount === 0) {
-                setTotalPage(() => 1);
-            } else {
-                setTotalPage(() => pageCount);
-            }
-            if (studentData.length === 0) {
-                setData(() => []);
-                setIsLoading(false)
-                return;
-            }
-            setData(() => studentData);
+            const studentList = responseData?.data;
+
+            setData(() => studentList);
             setIsLoading(false)
+
         }
         else {
             console.error("fetch req failed: ", response)
         }
+    };
 
-    }
-
-    const classList = async () => {
+    const getClassList = async () => {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/common/class-list`,
+            `${process.env.NEXT_PUBLIC_API_URL}/class/list`,
             {
                 method: 'POST',
                 headers: {
@@ -359,38 +289,54 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
                     'Authorization': `bearer ${accessToken}`
                 },
                 body: JSON.stringify({
-                    lg: lng
-                })
+                    lg: lng,
+                }),
             },
         );
+
         if (response.ok) {
             const responseData = await response.json();
-            setClasses(responseData?.data);
+            const classList = responseData?.data;
+            // console.log('🚀 ~ student-payment-table.tsx:410 ~ classList:', classList);
+            setClassList(classList);
         }
-        else {
-            console.error("fetch req failed: ", response)
-        }
+    };
+
+    const markAttendance = async () => {
+        console.log('🚀 ~ attendance-table.tsx:458 ~ attendanceSelections:', attendanceSelections);
+
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/attendance/mark-attendance`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `bearer ${accessToken}`,
+                    },
+                    body: JSON.stringify({ attendanceSelections }),
+                }
+            );
+
+            const data = await response.json()
+
+            if (data.status === 'success') {
+                toast.success(data.message)
+            } else {
+                toast.error(data.message)
+            }
+
+        } catch (error) {
+            console.error("Error marking attendance:", error);
+        };
     }
-
     useEffect(() => {
-        classList();
-        localStorage.setItem(
-            "storeTableColumnVisibility",
-            JSON.stringify(ColumnVisibility)
-        );
-    }, [columnVisibility]);
-
-    useEffect(() => {
-        getAttendanceData({
-            itemsPerPage: pagination.pageSize,
-            currentPageNumber: pagination.pageIndex,
-            sortOrder: "desc",
-            filterBy: ""
-        })
-    }, [pagination]);
+        studentListData(studentClass);
+        getClassList();
+    }, []);
 
     const table = useReactTable({
-        data,
+        data: data,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -398,60 +344,34 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
         state: {
             sorting,
             columnFilters,
-            columnVisibility,
             rowSelection,
             globalFilter, // use the state variable here
         },
-        onGlobalFilterChange: setGlobalFilter, // <-- important
     })
     return (
         <div className="w-full">
             <div className="flex justify-start flex-col gap-2 md:flex-row md:justify-between items-start md:items-center mb-2">
-                <div className="w-full">
-                    <Input
-                        className="w-full"
-                        placeholder={t("search_hint.search_by_full_name")}
-                        value={globalFilter}
-                        onChange={(event) => setGlobalFilter(event.target.value)}
-                    />
-                </div>
-                <div className="w-full flex justify-between md:justify-end  gap-2">
-                    {/* Column Toggle Popover */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" size="default" className="flex items-center gap-2">
-                                <Settings2 className="h-4 w-4" />
-                                {t("columns")}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56 p-3">
-                            <p className="text-sm font-medium mb-2">{t("toggle_columns")}</p>
-                            <Separator className="mb-2" />
-                            <ScrollArea className="h-48 pr-2">
-                                <div className="flex flex-col gap-2">
-                                    {table
-                                        .getAllLeafColumns()
-                                        .filter((col) => col.getCanHide())
-                                        .map((column) => (
-                                            <div key={column.id} className="flex items-center gap-2">
-                                                <Checkbox
-                                                    checked={column.getIsVisible()}
-                                                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                                />
-                                                <label className="capitalize text-sm cursor-pointer">
-                                                    {column.id.replaceAll("_", " ")}
-                                                </label>
-                                            </div>
-                                        ))}
-                                </div>
-                            </ScrollArea>
-                        </PopoverContent>
-                    </Popover>
+                <div className="w-full flex flex-col sm:flex-row gap-2">
+                    <Select value={studentClass} onValueChange={(value) => {
+                        setStudentClass(value)
+                        setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+                        studentListData(value)
+                    }}>
+                        <SelectTrigger className="w-40">
+                            <SelectValue placeholder={t("select_class")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {classList.map((item) => (
+                                <SelectItem key={item.id} value={item.class_name}>
+                                    {item.class_name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
@@ -486,29 +406,34 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        ) : table.getRowModel().rows.length === 0 && table.getState().globalFilter ? (
-                            // If no rows match the filter, show the "No data matched" message inside a table row
+                        ) : table.getRowModel().rows.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No data matched
+                                    {studentClass
+                                        ? t("no_data_matched")
+                                        : t("no_results_found")}
                                 </TableCell>
                             </TableRow>
-                        ) : data.length > 0 ? (
+                        ) : (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow className="text-center" key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                                <TableRow
+                                    key={row.id}
+                                    className="text-center"
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="p-3 border-r rounded ">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        <TableCell
+                                            key={cell.id}
+                                            className="p-3 border-r rounded"
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
-                        ) : (
-                            <TableRow className="">
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
-                                </TableCell>
-                            </TableRow>
                         )}
                     </TableBody>
                 </Table>
@@ -518,69 +443,26 @@ const AttendanceTable = ({ session }: AttendanceTableProps) => {
                     Total&nbsp;{table.getFilteredRowModel().rows.length} row(s)
                 </div>
                 <div className="flex md:items-center sm:space-x-6 lg:space-x-8">
-                    <div className="sm:flex hidden whitespace-nowrap items-center space-x-2">
-                        <p className="text-sm font-medium">Rows per page</p>
-                        <Select
-                            value={`${table.getState().pagination.pageSize}`}
-                            onValueChange={(value) => {
-                                setPagination({
-                                    pageIndex: 0,
-                                    pageSize: Number(value)
-                                });
-                                table.setPageSize(Number(value))
-                            }}
-                        >
-                            <SelectTrigger className="h-8 ">
-                                <SelectValue placeholder={table.getState().pagination.pageSize} />
-                            </SelectTrigger>
-                            <SelectContent side="top">
-                                {[2, 5, 10, 20, 30, 40, 50].map((pageSize) => (
-                                    <SelectItem key={pageSize} value={`${pageSize}`}
-                                    >
-                                        {pageSize}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    {/* Pagination Controls */}
-                    <div className="flex w-full gap-4 md:flex-row md:items-center justify-between md:w-auto">
-                        {/* Current Page Info and Navigation */}
-                        <div className="flex flex-row justify-between text-sm items-center gap-4 md:flex-row md:gap-8">
-                            Page {pagination.pageIndex + 1} of{' '}
-                            {totalPage}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Button
-                                variant="outline"
-                                className="h-8 w-24 p-2"
-                                onClick={() => {
-                                    handlePaginationState("prev");
-                                }}
-                                disabled={pagination.pageIndex === 0}
-                            >
-                                <span className="sr-only">Go to previous page</span>
-                                <ChevronLeftIcon className="h-4 w-4" />
-                                Previous
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="h-8 w-16 p-2"
-                                onClick={() => {
-                                    handlePaginationState("next");
-                                }}
-                                disabled={pagination.pageIndex + 1 === totalPage}
-                            >
-                                <span className="sr-only">Go to next page</span>
-                                Next
-                                <ChevronRightIcon className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
+                    <Button
+                        variant="secondary"
+                        onClick={markAttendance}
+                        disabled={attendanceSelections.length === 0}
+                    >
+                        {t("submit")}
+                    </Button>
+
+                    <Button
+                        variant="outline"
+                        onClick={() => setAttendanceSelections([])}
+                        disabled={attendanceSelections.length === 0}
+                    >
+                        {t("reset")}
+
+                    </Button>
                 </div>
             </div>
         </div >
     )
 }
 
-export default AttendanceTable;
+export default StudentPaymentsTable;

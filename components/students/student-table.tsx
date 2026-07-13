@@ -136,35 +136,9 @@ const StudentsTable = ({ session }: StudentsTableProps) => {
         {
             accessorKey: "class",
             header: t("class"),
-            cell: ({ row }) => {
-                const classString = row.getValue("class");
-
-                let classArray: number[] = [];
-
-                // 🔥 Handle both string and array (future-proof)
-                if (typeof classString === "string") {
-                    try {
-                        classArray = JSON.parse(classString);
-                    } catch {
-                        classArray = [];
-                    }
-                } else if (Array.isArray(classString)) {
-                    classArray = classString;
-                }
-
-                const formattedClass = classArray
-                    .map((id: number) => classMap[id])
-                    .filter(Boolean)
-                    .join(", ");
-
-                return (
-                    <div className="whitespace-nowrap">
-                        {formattedClass
-                            ? highlightText(formattedClass, globalFilter)
-                            : "N/A"}
-                    </div>
-                );
-            },
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("class")}</div>
+            ),
         },
 
         {

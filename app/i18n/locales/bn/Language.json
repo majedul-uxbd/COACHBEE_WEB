@@ -94,6 +94,10 @@
     "update_teacher_salary_dialog_description": "শিক্ষকের বেতন আপডেট করতে নিচের বিবরণগুলি পূরণ করুন।",
     "present": "উপস্থিত",
     "absent": "অনুপস্থিত",
+    "late": "দেরী",
+    "no_results_found": "কোন ফলাফল পাওয়া যায়নি",
+    "no_data_matched": "কোন তথ্য মেলেনি",
+    "select_class": "ক্লাস নির্বাচন করুন",
     "sidebar": {
         "dashboard": "ড্যাশবোর্ড",
         "students": "শিক্ষার্থীবৃন্দ",
