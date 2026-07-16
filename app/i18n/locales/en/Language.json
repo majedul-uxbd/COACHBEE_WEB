@@ -105,7 +105,9 @@
         "payroll": "Payroll",
         "student_payments": "Student Fees",
         "teachers_salary": "Teachers Salary",
-        "attendance": "Attendance"
+        "attendance": "Attendance",
+        "mark_attendance": "Mark Attendance",
+        "attendance_table": "Attendance Table"
     },
     "search_hint": {
         "search_by_full_name": "Search by Full name..."

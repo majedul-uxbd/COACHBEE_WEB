@@ -108,7 +108,7 @@ const classOptions = [
 const TeachersSalaryTable = ({ session }: TeachersSalaryTableProps) => {
     const accessToken = session?.user?.id;
     const [data, setData] = useState<TeacherSalary[]>([]);
-    // const [studentList, setStudentList] = useState<StudentList[]>([]);
+    const [classes, setClasses] = useState<any[]>([]);
     const [classFilter, setClassFilter] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
     const [totalPage, setTotalPage] = useState<number>();
@@ -173,6 +173,10 @@ const TeachersSalaryTable = ({ session }: TeachersSalaryTableProps) => {
         });
     }, [data, classFilter]);
 
+    const classMap = Object.fromEntries(
+        classes.map((cls: any) => [cls.id, cls.class_name])
+    );
+
     const columns: ColumnDef<TeacherSalary>[] = [
 
         {
@@ -212,32 +216,32 @@ const TeachersSalaryTable = ({ session }: TeachersSalaryTableProps) => {
             accessorKey: "class",
             header: t("class"),
             cell: ({ row }) => {
-                let classes: string | number[] = row.getValue("class");
-                // console.log(classes)
+                const rawClassValue = row.getValue("class");
 
-                // 👉 Step 1: Convert string "[6]" → [6]
-                if (typeof classes === "string") {
+                let classDisplay = "-";
+
+                if (typeof rawClassValue === "string") {
                     try {
-                        classes = JSON.parse(classes);
+                        const parsedClassValue = JSON.parse(rawClassValue);
+                        if (Array.isArray(parsedClassValue)) {
+                            classDisplay = parsedClassValue
+                                .map((value: string | number) => classMap[value] ?? value)
+                                .join(", ");
+                        } else {
+                            classDisplay = rawClassValue;
+                        }
                     } catch {
-                        classes = [] as number[];
+                        classDisplay = rawClassValue;
                     }
+                } else if (Array.isArray(rawClassValue)) {
+                    classDisplay = rawClassValue
+                        .map((value: string | number) => classMap[value] ?? value)
+                        .join(", ");
                 }
 
-                // 👉 Step 2: Ensure it's an array
-                const classArray = Array.isArray(classes) ? classes : [classes];
-
-                // 👉 Step 3: Convert numbers → words
-                const formatted = classArray
-                    .filter((num): num is number => typeof num === "number")
-                    .map((num) => numberToWord[num] || num)
-                    .join(", ");
-
                 return (
-                    <div className="whitespace-nowrap">
-                        {formatted
-                            ? highlightText(formatted, globalFilter)
-                            : "N/A"}
+                    <div className="whitespace-nowrap text-start">
+                        {highlightText(classDisplay, globalFilter)}
                     </div>
                 );
             },

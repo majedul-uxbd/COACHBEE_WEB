@@ -38,7 +38,7 @@ import { AttendanceData } from "@/interfaces/attendance.interface";
 import { toast } from "sonner";
 
 
-interface StudentPaymentsTableProps {
+interface MarkAttendanceComponentProps {
     session: any;
 }
 
@@ -64,12 +64,11 @@ const highlightText = (text: string, search: string) => {
 
 
 
-const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
+const MarkAttendanceComponent = ({ session }: MarkAttendanceComponentProps) => {
     const accessToken = session?.user?.id;
     const [data, setData] = useState<AttendanceData[]>([]);
     const [studentClass, setStudentClass] = useState<string>("");
     const [isLoading, setIsLoading] = useState(true);
-    const [totalPage, setTotalPage] = useState<number>();
     const [sorting, setSorting] = useState<SortingState>([])
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
@@ -107,7 +106,7 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
             return [...prev, { studentId, status }];
         });
     };
-    console.log('🚀 attendanceSelections:', attendanceSelections);
+    // console.log('🚀 attendanceSelections:', attendanceSelections);
     const columns: ColumnDef<AttendanceData>[] = [
 
         {
@@ -465,4 +464,4 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
     )
 }
 
-export default StudentPaymentsTable;
+export default MarkAttendanceComponent;

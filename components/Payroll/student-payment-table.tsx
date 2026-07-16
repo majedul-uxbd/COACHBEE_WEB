@@ -209,36 +209,9 @@ const StudentPaymentsTable = ({ session }: StudentPaymentsTableProps) => {
         {
             accessorKey: "class",
             header: t("class"),
-            cell: ({ row }) => {
-                let classes: string | number[] = row.getValue("class");
-                console.log(classes)
-
-                // 👉 Step 1: Convert string "[6]" → [6]
-                if (typeof classes === "string") {
-                    try {
-                        classes = JSON.parse(classes);
-                    } catch {
-                        classes = [] as number[];
-                    }
-                }
-
-                // 👉 Step 2: Ensure it's an array
-                const classArray = Array.isArray(classes) ? classes : [classes];
-
-                // 👉 Step 3: Convert numbers → words
-                const formatted = classArray
-                    .filter((num): num is number => typeof num === "number")
-                    .map((num) => numberToWord[num] || num)
-                    .join(", ");
-
-                return (
-                    <div className="whitespace-nowrap">
-                        {formatted
-                            ? highlightText(formatted, globalFilter)
-                            : "N/A"}
-                    </div>
-                );
-            },
+            cell: ({ row }) => (
+                <div className="whitespace-nowrap ">{row.getValue("class")}</div>
+            ),
         },
 
         {

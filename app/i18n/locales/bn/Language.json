@@ -105,7 +105,9 @@
         "payroll": "বেতন তালিকা",
         "student_payments": "শিক্ষার্থীদের ফি",
         "teachers_salary": "শিক্ষকদের বেতন",
-        "attendance": "উপস্থিতি"
+        "attendance": "উপস্থিতি",
+        "mark_attendance": "উপস্থিতি চিহ্নিত করুন",
+        "attendance_table": "উপস্থিতি টেবিল"
     },
     "search_hint": {
         "search_by_full_name": "পূর্ণ নাম দিয়ে অনুসন্ধান করুন..."

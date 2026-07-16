@@ -140,31 +140,32 @@ const TeachersTable = ({ session }: TeachersTableProps) => {
             accessorKey: "class",
             header: t("class"),
             cell: ({ row }) => {
-                const classString = row.getValue("class");
+                const rawClassValue = row.getValue("class");
 
-                let classArray: number[] = [];
+                let classDisplay = "-";
 
-                // Handle both string and array
-                if (typeof classString === "string") {
+                if (typeof rawClassValue === "string") {
                     try {
-                        classArray = JSON.parse(classString);
+                        const parsedClassValue = JSON.parse(rawClassValue);
+                        if (Array.isArray(parsedClassValue)) {
+                            classDisplay = parsedClassValue
+                                .map((value: string | number) => classMap[value] ?? value)
+                                .join(", ");
+                        } else {
+                            classDisplay = rawClassValue;
+                        }
                     } catch {
-                        classArray = [];
+                        classDisplay = rawClassValue;
                     }
-                } else if (Array.isArray(classString)) {
-                    classArray = classString;
+                } else if (Array.isArray(rawClassValue)) {
+                    classDisplay = rawClassValue
+                        .map((value: string | number) => classMap[value] ?? value)
+                        .join(", ");
                 }
 
-                const formattedClass = classArray
-                    .map((id: number) => classMap[id])
-                    .filter(Boolean)
-                    .join(", ");
-
                 return (
-                    <div className="whitespace-nowrap">
-                        {formattedClass
-                            ? highlightText(formattedClass, globalFilter)
-                            : "N/A"}
+                    <div className="whitespace-nowrap text-start">
+                        {highlightText(classDisplay, globalFilter)}
                     </div>
                 );
             },

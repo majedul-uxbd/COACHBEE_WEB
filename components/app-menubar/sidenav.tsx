@@ -1,6 +1,8 @@
 "use client";
 
 import {
+	CalendarClock,
+	CalendarDays,
 	CircleDollarSign,
 	LayoutDashboard,
 	MenuIcon,
@@ -22,6 +24,7 @@ import { cn } from "@/lib/utils";
 import TeacherIcon from "../shared/set-teachers-icons";
 import { useTranslation } from "@/app/i18n/client";
 import TeachersSalaryIcon from "../shared/set-teachers-salary-icons";
+import { CalendarDay } from "react-day-picker";
 
 interface SidebarPageProps {
 	session: any;
@@ -214,6 +217,66 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								</MenuItem>
 							</Menu>
 
+							{/* Attendance Menu Item (only for admin) */}
+							{(session?.role === "admin") && (
+
+								<>
+									<Menu menuItemStyles={{
+										button: {
+											'&:hover': {
+												backgroundColor: 'transparent', // removes hover color
+											},
+										},
+									}}>
+										<SubMenu
+											className="cursor-pointer text-[14px]"
+											icon={
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<CalendarClock className="size-4" />
+														</TooltipTrigger>
+														<TooltipContent
+															side="right"
+															align="center"
+															className="border p-2"
+														>
+															{t("sidebar.attendance")}
+														</TooltipContent>
+													</Tooltip>
+												</TooltipProvider>
+											}
+											label={t("sidebar.attendance")}
+										>
+
+											<MenuItem className="dark:bg-black">
+												<Link
+													className={cn(
+														isActiveRoute(`/${lng}/attendance/mark-attendance`) && "bg-accent p-2 cursor-pointer",
+														"flex items-center text-[13px] gap-2"
+													)}
+													href={`/${lng}/attendance/mark-attendance`}
+												>
+													<UserCheck2 className="size-4" /> {t("sidebar.mark_attendance")}
+												</Link>
+											</MenuItem>
+
+											<MenuItem className="dark:bg-black">
+												<Link
+													className={cn(
+														isActiveRoute(`/${lng}/attendance/attendance-table`) && "bg-accent p-2 cursor-pointer",
+														"flex items-center text-[13px] gap-2"
+													)}
+													href={`/${lng}/attendance/attendance-table`}
+												>
+													<CalendarDays className="size-4" />{t("sidebar.attendance_table")}
+												</Link>
+											</MenuItem>
+										</SubMenu>
+									</Menu>
+								</>
+							)}
+
 							{/* Payroll SubMenu */}
 							<Menu menuItemStyles={{
 								button: {
@@ -242,10 +305,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 									}
 									label={t("sidebar.payroll")}
 								>
-									{/* Student Fees */}
-									{/* <TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild> */}
+
 									<MenuItem className="dark:bg-black">
 										<Link
 											className={cn(
@@ -257,17 +317,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 											<CircleDollarSign className="size-4" /> {t("sidebar.student_payments")}
 										</Link>
 									</MenuItem>
-									{/* </TooltipTrigger>
-										<TooltipContent>
-											{t("sidebar.student_payments")}
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider> */}
 
-									{/* Teachers Salary */}
-									{/* <TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild> */}
 									<MenuItem className="dark:bg-black">
 										<Link
 											className={cn(
@@ -279,17 +329,11 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 											<TeachersSalaryIcon />{t("sidebar.teachers_salary")}
 										</Link>
 									</MenuItem>
-									{/* </TooltipTrigger>
-										<TooltipContent>
-											{t("sidebar.teachers_salary")}
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider> */}
 								</SubMenu>
 							</Menu>
 						</>
 					)}
-					{(session?.role === "admin" || session?.role === "teacher") && (
+					{(session?.role === "teacher") && (
 						<>
 							{/* Students Attendance Menu Item */}
 							<Menu menuItemStyles={{
@@ -300,8 +344,8 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								},
 							}}>
 								<MenuItem
-									component={<Link href={`/${lng}/attendance`} />}
-									className={cn(isActiveRoute(`/${lng}/attendance`) && "bg-accent")}
+									component={<Link href={`/${lng}/attendance/mark-attendance`} />}
+									className={cn(isActiveRoute(`/${lng}/attendance/mark-attendance`) && "bg-accent")}
 									icon={
 										<TooltipProvider>
 											<Tooltip>
@@ -325,6 +369,7 @@ const SidebarPage = ({ session }: SidebarPageProps) => {
 								</MenuItem>
 							</Menu>
 						</>)}
+
 				</div>
 			</Sidebar >
 
